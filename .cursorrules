@@ -1,0 +1,121 @@
+# Règles de Conception et Design Système Antigravity pour Izi-Facture
+
+Ce document définit les règles strictes d'architecture, de design et de code qui doivent être appliquées par l'assistant IA lors de la création ou de la modification de toute page ou de tout composant au sein du projet **Izi-Facture**.
+
+---
+
+## 1. Palette de Couleurs & Mode Sombre (Tailwind v4)
+
+L'application utilise un système de mode sombre basé sur des sélecteurs (`.dark`). Toutes les variables de couleur sont définies dans `app/globals.css`.
+
+### Couleurs de Fond et Conteneurs
+*   **Mode Clair (Light) :**
+    *   Fond de page (`--background`) : `#f8fafc` (Slate 50)
+    *   Texte principal (`--foreground`) : `#0f172a` (Slate 900)
+    *   Fond des cartes/composants (`--card-bg`) : `#ffffff`
+    *   Bordures de cartes (`--card-border`) : `#e2e8f0` (Slate 200) ou `#f1f5f9` (Slate 100)
+*   **Mode Sombre (Dark) :**
+    *   Fond de page (`--background`) : `#09090b` (Zinc 950)
+    *   Texte principal (`--foreground`) : `#f4f4f5` (Zinc 100)
+    *   Fond des cartes/composants (`--card-bg`) : `#18181b` (Zinc 900)
+    *   Bordures de cartes (`--card-border`) : `#27272a` (Zinc 800) ou `#3f3f46` (Zinc 700)
+
+### Couleurs d'Accentuation et d'Interaction
+*   **Mode Clair :**
+    *   Accent principal (`--accent`) : `#2563eb` (Blue 600)
+    *   Accent hover (`--accent-hover`) : `#1d4ed8` (Blue 700)
+    *   Texte secondaire/muté (`--text-muted`) : `#64748b` (Slate 500)
+*   **Mode Sombre :**
+    *   Accent principal (`--accent`) : `#3b82f6` (Blue 500)
+    *   Accent hover (`--accent-hover`) : `#60a5fa` (Blue 400)
+    *   Texte secondaire/muté (`--text-muted`) : `#a1a1aa` (Zinc 400)
+
+### Règle d'implémentation des couleurs :
+> [!IMPORTANT]
+> N'utilisez **jamais** de couleurs primaires pures (comme du rouge vif, du vert pur ou du bleu standard). Utilisez uniquement les variables CSS ou les teintes Slate/Zinc/Blue assorties pour garantir l'effet premium et harmonieux.
+
+---
+
+## 2. Typographie & Alignements
+
+### Typographie (Polices et Tailles)
+*   **Police sans-serif principale :** `Geist Sans`, `Inter`, `system-ui`, `sans-serif` (définie par `--font-sans`).
+*   **Titres de Page (H1) :** `text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1`.
+*   **Petits Titres de Catégories (Surtitres) :** `text-[10px]` ou `text-[11px] font-bold text-slate-400 dark:text-zinc-550 uppercase tracking-widest`.
+*   **Titres de Section/Cartes (H3) :** `text-sm font-bold text-slate-800 dark:text-zinc-200` ou `text-base font-bold text-slate-800 dark:text-zinc-200`.
+*   **Descriptions / Textes d'aide :** `text-xs text-slate-450 dark:text-zinc-500 font-medium` ou `text-[11px] text-slate-450 dark:text-zinc-500 font-medium`.
+
+### Mises en page et Alignements
+*   **Zone Principale de Contenu (`<main>`) :** `flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto w-full max-w-[1600px] mx-auto`.
+*   **Grilles Principales :** `grid grid-cols-1 xl:grid-cols-3 gap-6`.
+*   **Espacement vertical standard (Layouts) :** Utiliser `space-y-6`.
+*   **Padding interne des cartes (Paddings) :** `p-5` ou `p-6` selon le composant.
+*   **Alignements Flex :** Alignez toujours verticalement les icônes et le texte en utilisant `items-center` et `gap-2` ou `gap-3`.
+
+---
+
+## 3. Bordures, Angles Arrondis & Ombres
+
+### Angles Arrondis (Border Radius)
+*   **Cartes de tableau de bord / Panneaux principaux :** `rounded-2xl` (1rem / 16px).
+*   **Éléments interactifs (Boutons, Inputs, Sélecteurs, Menus de listes, Avatars) :** `rounded-xl` (0.75rem / 12px).
+*   **Badges de statut, Filtres, Pillules de données :** `rounded-lg` (0.5rem / 8px) ou `rounded-full`.
+
+### Bordures et Ombres (Borders & Shadows)
+*   Toutes les cartes doivent posséder une bordure fine et discrète.
+    *   **Light Mode :** `border border-slate-100` ou `border border-slate-200/60`.
+    *   **Dark Mode :** `border border-zinc-850` (ou `dark:border-zinc-800`).
+*   Utiliser les ombres personnalisées de globals.css :
+    *   `shadow-soft` : ombrage léger et moderne pour les cartes standards.
+    *   `shadow-premium` : pour les menus déroulants et modales.
+    *   `shadow-glow` : effet de halo bleu discret pour les états focus ou actifs.
+
+---
+
+## 4. Animations et Micro-Interactions
+
+Toutes les pages et tous les composants doivent donner une impression de fluidité et de réactivité.
+
+*   **Transitions obligatoires :** Toujours appliquer une transition sur les états de survol (hover) ou de clic (active) :
+    *   `transition-all duration-200` ou `transition-colors duration-150`.
+*   **Micro-animations de survol (Hover effects) :**
+    *   Les cartes de listes interactives doivent légèrement s'élever au survol : `hover:-translate-y-0.5 transition-all duration-200`.
+    *   Les boutons d'action doivent changer de couleur de fond de manière fluide (ex: `bg-blue-600 hover:bg-blue-700`).
+*   **Indicateurs Live :** Utiliser `animate-pulse` sur les petits points d'état (ex: pastille verte Orange/MTN actifs, icône de live feed).
+
+---
+
+## 5. Badges de Statut (Status Badges)
+
+Les statuts (ex: statut de facture, de paiement, de compte) doivent suivre le style suivant :
+*   Taille petite (`text-xs` ou `text-[10px]`), texte gras (`font-bold`), icône intégrée avec un espacement `gap-1.5`, bordure fine.
+
+| Statut | Couleur / Thème | Classes CSS (Light & Dark) |
+| :--- | :--- | :--- |
+| **Payée / Succès** | Émeraude (Green) | `bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-950/45` |
+| **Envoyée / En attente** | Ambre (Orange) | `bg-amber-50 text-amber-855 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200/50 dark:border-amber-950/45` |
+| **En retard / Alerte** | Rose (Red) | `bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/50 dark:border-rose-950/45` |
+| **Brouillon / Neutre** | Slate (Gray) | `bg-slate-50 text-slate-655 dark:bg-zinc-800 dark:text-zinc-400 border border-slate-200/50 dark:border-zinc-700/30` |
+| **Annulée / Inactive** | Zinc (Muted) | `bg-zinc-100 text-zinc-600 dark:bg-zinc-800/40 dark:text-zinc-500 border border-zinc-200/50 dark:border-zinc-800` |
+
+---
+
+## 6. Adaptabilité Mobile et Responsivité (Responsiveness)
+
+*   **Approche Mobile-First :** Toutes les grilles complexes doivent être en `grid-cols-1` par défaut et passer en multi-colonnes sur les écrans plus grands (`sm:grid-cols-2`, `lg:grid-cols-4`, `xl:grid-cols-3`).
+*   **En-têtes de Page :** Les lignes d'en-tête doivent s'empiler sur mobile : `flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4`.
+*   **Tableaux Responsifs :**
+    *   Toujours envelopper les balises `<table>` dans un conteneur `<div className="overflow-x-auto">`.
+    *   Attribuer des largeurs minimales (`min-w-[...]`) ou relatives en pourcentage aux colonnes pour éviter qu'elles ne soient écrasées sur petit écran.
+*   **Barre Latérale (Sidebar) :**
+    *   Sur mobile, elle doit se transformer en tiroir (drawer) avec un arrière-plan flouté (`backdrop-blur-sm bg-slate-900/40`) contrôlé par un état `isOpen`.
+    *   Sur écran large (`lg:`), elle doit être ancrée sur le côté : `lg:sticky lg:z-10`.
+
+---
+
+## 7. Structure de Code Recommandée
+
+Lors de l'écriture de nouveaux fichiers `.tsx` :
+1.  **Directive Client :** Toujours commencer par `'use client';` si le composant utilise des hooks React (`useState`, `useEffect`, etc.).
+2.  **Imports d'icônes :** Utilisez les icônes de `lucide-react` avec des tailles adaptées (ex: `size={15}` pour les tables/badges, `size={18}` ou `size={20}` pour les boutons et cartes de stats).
+3.  **Organisation des classes :** Suivez un ordre logique pour les classes Tailwind (ex: `layout flex/grid -> dimensions w/h -> padding/margin p/m -> background bg -> border border -> text colors/sizes -> dark states dark: -> transitions/animations`).

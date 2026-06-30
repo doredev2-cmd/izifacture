@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide d'utilisation - Izi-Facture</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #334155;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #f8fafc;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        h1 {
+            color: #0f172a;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 900;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+        h2 {
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+            margin-top: 2.5rem;
+        }
+        h3 {
+            color: #2563eb;
+            margin-top: 1.5rem;
+        }
+        ul, ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        .step {
+            background-color: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+            margin-bottom: 1rem;
+        }
+        .alert {
+            background-color: #fffbeb;
+            color: #b45309;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Izi-Facture</h1>
+        <div class="subtitle">Le Guide d'Utilisation Complet (De A à Z)</div>
+        
+        <p>Bienvenue dans le guide officiel d'utilisation de <strong>Izi-Facture</strong>. Cette application est conçue pour simplifier la gestion de vos clients, factures et finances. Suivez ce guide pour prendre en main toutes les fonctionnalités de l'outil.</p>
+        
+        <div class="alert">
+            💡 Astuce : Vous pouvez imprimer ce document (Ctrl+P ou Cmd+P) ou l'enregistrer au format PDF pour l'avoir toujours à portée de main !
+        </div>
+
+        <h2>1. Prise en main et "Mes Entreprises"</h2>
+        <p>Izi-Facture est multi-entreprises. Vous pouvez gérer plusieurs entités (ou business) distinctes depuis le même compte.</p>
+        <div class="step">
+            <h3>Ajouter votre première entreprise</h3>
+            <ol>
+                <li>Allez dans le menu latéral (à gauche).</li>
+                <li>Cliquez sur le sélecteur d'entreprise tout en haut.</li>
+                <li>Sélectionnez <strong>"Gérer mes entreprises"</strong>.</li>
+                <li>Renseignez le nom, l'email, l'adresse, choisissez une devise (ex: FCFA) et un logo (ex: 🏢).</li>
+                <li>Cliquez sur "Ajouter cette entreprise". Elle apparaîtra instantanément.</li>
+            </ol>
+        </div>
+
+        <h2>2. Le Tableau de Bord (Dashboard)</h2>
+        <p>Le tableau de bord est la première page que vous voyez. Il résume l'activité de l'entreprise actuellement sélectionnée.</p>
+        <ul>
+            <li><strong>Chiffre d'Affaires Global :</strong> La somme de toutes vos factures payées.</li>
+            <li><strong>En Attente (Créances) :</strong> L'argent que vos clients vous doivent.</li>
+            <li><strong>Filtre de Dates :</strong> Utilisez les champs "Du" et "Au" en haut pour filtrer les statistiques sur une période précise.</li>
+            <li><strong>Graphique des Revenus :</strong> Affiche l'évolution de vos entrées d'argent par mois.</li>
+        </ul>
+
+        <h2>3. Gestion des Clients</h2>
+        <p>Avant de créer une facture, il est recommandé de créer des clients dans votre carnet d'adresses.</p>
+        <div class="step">
+            <h3>Ajouter un client</h3>
+            <ol>
+                <li>Cliquez sur <strong>Clients</strong> dans le menu latéral.</li>
+                <li>Cliquez sur le bouton bleu <strong>"+ Nouveau Client"</strong> en haut à droite.</li>
+                <li>Remplissez les informations (Nom, Contact, Email, Adresse).</li>
+                <li>Cliquez sur <strong>"Créer le Client"</strong>.</li>
+            </ol>
+        </div>
+
+        <h2>4. Création et Gestion des Factures</h2>
+        <p>La fonctionnalité centrale d'Izi-Facture !</p>
+        <div class="step">
+            <h3>Créer une nouvelle facture</h3>
+            <ol>
+                <li>Allez dans l'onglet <strong>Factures</strong> et cliquez sur <strong>"+ Nouvelle Facture"</strong>.</li>
+                <li>Sélectionnez un client existant (ou entrez son nom manuellement).</li>
+                <li><strong>Dates :</strong> Définissez la date d'émission et la date d'échéance.</li>
+                <li><strong>Articles :</strong> Ajoutez vos produits ou services. Renseignez la quantité et le prix unitaire, le total se calcule automatiquement. Vous pouvez appliquer une remise si besoin.</li>
+                <li>Vérifiez la prévisualisation A4 en temps réel sur la droite (sur ordinateur).</li>
+                <li>Cliquez sur <strong>"Enregistrer"</strong> ou <strong>"Enregistrer & Envoyer"</strong>.</li>
+            </ol>
+        </div>
+        
+        <h3>Statuts d'une Facture</h3>
+        <ul>
+            <li><strong>Brouillon :</strong> Facture créée mais pas encore validée.</li>
+            <li><strong>Envoyée :</strong> Transmise au client, en attente de paiement.</li>
+            <li><strong>Payée :</strong> Montant réglé. L'argent est ajouté à vos revenus.</li>
+            <li><strong>En retard :</strong> Date d'échéance dépassée, le client n'a toujours pas payé.</li>
+            <li><strong>Annulée :</strong> Facture invalidée.</li>
+        </ul>
+
+        <h2>5. Envoyer une Facture (WhatsApp / Email)</h2>
+        <p>Vous pouvez partager vos factures facilement depuis la vue détaillée d'une facture.</p>
+        <div class="step">
+            <ol>
+                <li>Ouvrez une facture.</li>
+                <li>Cliquez sur le bouton <strong>"Envoyer"</strong> en haut à droite.</li>
+                <li>Choisissez le canal : <strong>WhatsApp</strong> (envoie un message pré-rempli) ou <strong>Email</strong> (envoie un brouillon via votre client mail par défaut).</li>
+            </ol>
+        </div>
+
+        <h2>6. Le Portefeuille (Wallet) et les Paiements</h2>
+        <p>Izi-Facture intègre un suivi de votre trésorerie (Orange Money, MTN, Virement, Espèces).</p>
+        <ul>
+            <li><strong>Dépôt de fonds :</strong> Utilisez le bouton "Ajouter des fonds" (Flèche verte) pour enregistrer une rentrée d'argent manuelle.</li>
+            <li><strong>Retrait :</strong> Utilisez le bouton "Retirer" (Flèche rouge) pour enregistrer une sortie ou dépense.</li>
+            <li><strong>Clés d'API (Optionnel) :</strong> Vous pouvez renseigner des clés API dans la section Configuration Mobile Money si votre entreprise dispose d'une passerelle automatisée.</li>
+        </ul>
+
+        <h2>7. Rapports & Budgets</h2>
+        <ul>
+            <li><strong>Budgets :</strong> Définissez des objectifs de revenus mensuels et suivez votre progression visuellement.</li>
+            <li><strong>Rapports :</strong> Accédez à des analyses approfondies sur vos meilleurs clients, vos produits phares et l'évolution de vos finances sur l'année.</li>
+        </ul>
+
+        <h2>8. Paramètres et Personnalisation</h2>
+        <p>Dans l'onglet <strong>Paramètres</strong>, vous pouvez :</p>
+        <ul>
+            <li>Modifier votre profil utilisateur.</li>
+            <li>Changer le thème de l'application (Clair / Sombre / Système).</li>
+            <li>Gérer les notifications et les options de sécurité (Mot de passe).</li>
+        </ul>
+
+        <div class="footer">
+            © 2024 Izi-Facture. Conçu pour faciliter votre business.
+        </div>
+    </div>
+</body>
+</html>
