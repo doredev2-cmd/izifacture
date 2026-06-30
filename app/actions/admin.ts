@@ -21,10 +21,10 @@ export async function listAllUsers() {
     return {
       users: data.users.map(u => ({
         id: u.id,
-        email: u.email,
+        email: u.email || '',
         name: u.user_metadata?.name || 'Sans Nom',
         created_at: u.created_at,
-        last_sign_in_at: u.last_sign_in_at,
+        last_sign_in_at: u.last_sign_in_at || null,
         is_banned: !!u.banned_until,
         is_admin: u.user_metadata?.role === 'admin'
       })),
