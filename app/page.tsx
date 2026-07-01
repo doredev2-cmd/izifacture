@@ -344,12 +344,13 @@ export default function DashboardPage() {
         let qTransactions = supabase.from('transactions').select('*');
 
         // Isolation des données (sauf pour admin)
-        if (role !== 'admin') {
-          qCompanies = qCompanies.eq('userId', user.id);
-          qClients = qClients.eq('userId', user.id);
-          qInvoices = qInvoices.eq('userId', user.id);
-          qTransactions = qTransactions.eq('userId', user.id);
-        }
+        // Les tables ne contiennent actuellement pas de colonne userId ou user_id dans Supabase.
+        // if (role !== 'admin') {
+        //   qCompanies = qCompanies.eq('userId', user.id);
+        //   qClients = qClients.eq('userId', user.id);
+        //   qInvoices = qInvoices.eq('userId', user.id);
+        //   qTransactions = qTransactions.eq('userId', user.id);
+        // }
 
         const { data: companiesData } = await qCompanies;
         if (companiesData && companiesData.length > 0) {
@@ -475,7 +476,6 @@ export default function DashboardPage() {
     try {
       const { error } = await supabase.from('invoices').upsert({
         id: savedInv.id,
-        userId: user?.id,
         companyId: savedInv.companyId || activeCompany.id,
         invoiceNumber: savedInv.invoiceNumber,
         clientId: savedInv.clientId,
@@ -495,10 +495,10 @@ export default function DashboardPage() {
 
       if (exists) {
         setInvoices(invoices.map(inv => inv.id === savedInv.id ? savedInv : inv));
-        showToast(`Facture ${savedInv.invoiceNumber} mise à jour avec succès.`, 'success');
+        showToast(`✅ La facture ${savedInv.invoiceNumber} a été mise à jour et synchronisée avec succès !`, 'success');
       } else {
         setInvoices([savedInv, ...invoices]);
-        showToast(`Facture ${savedInv.invoiceNumber} créée avec succès.`, 'success');
+        showToast(`✅ Excellente nouvelle ! La facture ${savedInv.invoiceNumber} a été générée et sauvegardée en toute sécurité.`, 'success');
         
         // Auto add notification
         const newNotif = {
@@ -513,7 +513,7 @@ export default function DashboardPage() {
       setActiveTab('invoices');
       setSelectedInvoice(null);
     } catch (error: any) {
-      showToast(`Erreur sauvegarde facture : ${error.message}`, 'error');
+      showToast(`❌ Échec de l'enregistrement en ligne. Détail : ${error.message}`, 'error');
     }
   };
 
@@ -533,8 +533,8 @@ export default function DashboardPage() {
   
   const handleAddTransaction = async (newTx: Transaction) => {
     try {
-      const txWithUser = { ...newTx, userId: user?.id };
-      const { error } = await supabase.from('transactions').insert([txWithUser]);
+      const { userId, ...txWithoutUser } = newTx as any;
+      const { error } = await supabase.from('transactions').insert([txWithoutUser]);
       if (error) throw error;
       setTransactions(prev => [newTx, ...prev]);
       
@@ -597,8 +597,8 @@ export default function DashboardPage() {
   // Handlers for Client management
   const handleAddClient = async (newCli: Client) => {
     try {
-      const clientWithUser = { ...newCli, userId: user?.id };
-      const { error } = await supabase.from('clients').insert([clientWithUser]);
+      const { userId, ...clientWithoutUser } = newCli as any;
+      const { error } = await supabase.from('clients').insert([clientWithoutUser]);
       if (error) throw error;
       setClients([...clients, newCli]);
       showToast(`Client "${newCli.name}" ajouté avec succès.`, 'success');
@@ -619,7 +619,8 @@ export default function DashboardPage() {
 
   const handleEditClient = async (updatedCli: Client) => {
     try {
-      const { error } = await supabase.from('clients').update(updatedCli).eq('id', updatedCli.id);
+      const { userId, ...clientWithoutUser } = updatedCli as any;
+      const { error } = await supabase.from('clients').update(clientWithoutUser).eq('id', updatedCli.id);
       if (error) throw error;
       setClients(clients.map(cli => cli.id === updatedCli.id ? updatedCli : cli));
       showToast(`Fiche client de "${updatedCli.name}" modifiée.`, 'success');
