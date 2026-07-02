@@ -61,6 +61,8 @@ export interface Transaction {
   method: 'Orange Money' | 'MTN Money' | 'Virement' | 'Espèces';
   amount: number;
   status: 'completed' | 'pending' | 'failed';
+  invoiceId?: string;
+  invoiceNumber?: string;
 }
 
 export interface Budget {

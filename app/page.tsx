@@ -472,6 +472,7 @@ export default function DashboardPage() {
   // Handlers for Invoice management
   const handleSaveInvoice = async (savedInv: Invoice) => {
     const exists = invoices.some(inv => inv.id === savedInv.id);
+    const oldInv = invoices.find(inv => inv.id === savedInv.id);
     try {
       const { error } = await supabase.from('invoices').upsert({
         id: savedInv.id,
@@ -493,9 +494,48 @@ export default function DashboardPage() {
       });
       if (error) throw error;
 
+      // Gérer la transaction liée
+      if (savedInv.status === 'paid') {
+        const isMethodOrange = savedInv.paymentMethod?.includes('Orange');
+        const isMethodMTN = savedInv.paymentMethod?.includes('MTN');
+        const finalMethod = (isMethodOrange ? 'Orange Money' : isMethodMTN ? 'MTN Money' : 'Virement') as any;
+
+        if (!oldInv || oldInv.status !== 'paid') {
+          // Créer une nouvelle transaction
+          const newTx: Transaction = {
+            id: `tx-${Date.now()}`,
+            userId: user?.id,
+            date: new Date().toLocaleDateString('fr-FR'),
+            description: `Encaissement Facture ${savedInv.invoiceNumber}`,
+            type: 'credit',
+            method: finalMethod,
+            amount: savedInv.amount,
+            status: 'completed',
+            invoiceId: savedInv.id,
+            invoiceNumber: savedInv.invoiceNumber
+          };
+          const { error: txErr } = await supabase.from('transactions').insert([newTx]);
+          if (txErr) throw txErr;
+          setTransactions(prev => [newTx, ...prev]);
+        } else if (oldInv.status === 'paid' && (oldInv.amount !== savedInv.amount || oldInv.paymentMethod !== savedInv.paymentMethod)) {
+          // Mettre à jour la transaction existante
+          const { error: txErr } = await supabase.from('transactions').update({
+            amount: savedInv.amount,
+            method: finalMethod
+          }).eq('invoiceId', savedInv.id);
+          if (txErr) throw txErr;
+          setTransactions(prev => prev.map(t => t.invoiceId === savedInv.id ? { ...t, amount: savedInv.amount, method: finalMethod } : t));
+        }
+      } else if (oldInv && oldInv.status === 'paid') {
+        // Supprimer la transaction si la facture n'est plus payée
+        const { error: txErr } = await supabase.from('transactions').delete().eq('invoiceId', savedInv.id);
+        if (txErr) throw txErr;
+        setTransactions(prev => prev.filter(t => t.invoiceId !== savedInv.id));
+      }
+
       if (exists) {
         setInvoices(invoices.map(inv => inv.id === savedInv.id ? savedInv : inv));
-        showToast(`✅ La facture ${savedInv.invoiceNumber} a été mise à jour et synchronisée avec succès !`, 'success');
+        showToast(`✅ La facture ${savedInv.invoiceNumber} a été mise à jour et le portefeuille a été actualisé !`, 'success');
       } else {
         setInvoices([savedInv, ...invoices]);
         showToast(`✅ Excellente nouvelle ! La facture ${savedInv.invoiceNumber} a été générée et sauvegardée en toute sécurité.`, 'success');
@@ -521,9 +561,14 @@ export default function DashboardPage() {
     try {
       const { error } = await supabase.from('invoices').delete().eq('id', id);
       if (error) throw error;
+      
+      // La base de données gère la suppression en cascade via foreign key ON DELETE CASCADE.
+      // Nous mettons simplement à jour l'état local pour être cohérent.
+      setTransactions(prev => prev.filter(t => t.invoiceId !== id));
+      
       const deletedInv = invoices.find(inv => inv.id === id);
       setInvoices(invoices.filter(inv => inv.id !== id));
-      showToast(`Facture ${deletedInv?.invoiceNumber || ''} supprimée.`, 'info');
+      showToast(`Facture ${deletedInv?.invoiceNumber || ''} supprimée. Le portefeuille a été ajusté.`, 'info');
       setActiveTab('invoices');
       setSelectedInvoice(null);
     } catch (error: any) {
@@ -560,30 +605,38 @@ export default function DashboardPage() {
 
   const handleStatusChange = async (id: string, newStatus: Invoice['status']) => {
     try {
+      const oldInv = invoices.find(inv => inv.id === id);
+      if (!oldInv) return;
+
       const { error } = await supabase.from('invoices').update({ status: newStatus }).eq('id', id);
       if (error) throw error;
-      setInvoices(invoices.map(inv => {
-        if (inv.id === id) {
-          if (newStatus === 'paid' && inv.status !== 'paid') {
-            // Log a Transaction when invoice is marked paid
-            const newTx: Transaction = {
-              id: `tx-${Date.now()}`,
-              userId: user?.id,
-              date: new Date().toLocaleDateString('fr-FR'),
-              description: `Encaissement Facture ${inv.invoiceNumber}`,
-              type: 'credit',
-              method: (inv.paymentMethod?.includes('Orange') ? 'Orange Money' : inv.paymentMethod?.includes('MTN') ? 'MTN Money' : 'Virement') as any,
-              amount: inv.amount,
-              status: 'completed'
-            };
-            handleAddTransaction(newTx);
-          } else {
-            showToast(`Statut de la facture ${inv.invoiceNumber} mis à jour : ${newStatus}`, 'info');
-          }
-          return { ...inv, status: newStatus };
-        }
-        return inv;
-      }));
+
+      if (newStatus === 'paid' && oldInv.status !== 'paid') {
+        // Enregistrer la transaction d'encaissement
+        const newTx: Transaction = {
+          id: `tx-${Date.now()}`,
+          userId: user?.id,
+          date: new Date().toLocaleDateString('fr-FR'),
+          description: `Encaissement Facture ${oldInv.invoiceNumber}`,
+          type: 'credit',
+          method: (oldInv.paymentMethod?.includes('Orange') ? 'Orange Money' : oldInv.paymentMethod?.includes('MTN') ? 'MTN Money' : 'Virement') as any,
+          amount: oldInv.amount,
+          status: 'completed',
+          invoiceId: oldInv.id,
+          invoiceNumber: oldInv.invoiceNumber
+        };
+        await handleAddTransaction(newTx);
+      } else if (newStatus !== 'paid' && oldInv.status === 'paid') {
+        // Supprimer la transaction si le statut passe de payé à autre chose
+        const { error: txErr } = await supabase.from('transactions').delete().eq('invoiceId', id);
+        if (txErr) throw txErr;
+        setTransactions(prev => prev.filter(t => t.invoiceId !== id));
+        showToast(`Statut de la facture ${oldInv.invoiceNumber} mis à jour : ${newStatus}. Le portefeuille a été actualisé.`, 'info');
+      } else {
+        showToast(`Statut de la facture ${oldInv.invoiceNumber} mis à jour : ${newStatus}`, 'info');
+      }
+
+      setInvoices(invoices.map(inv => inv.id === id ? { ...inv, status: newStatus } : inv));
       
       // Update selected invoice reference
       if (selectedInvoice && selectedInvoice.id === id) {

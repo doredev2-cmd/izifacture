@@ -57,10 +57,10 @@ export default function WalletPage({ currency = 'GNF', setActiveTab, showToast, 
     }, initialBalance);
   };
 
-  const orangeMoneyBalance = getDynamicBalance('Orange Money', 14500000);
-  const mtnMoneyBalance = getDynamicBalance('MTN Money', 9800000);
-  const bankBalance = getDynamicBalance('Virement', 125000000);
-  const cashBalance = getDynamicBalance('Espèces', 1200000);
+  const orangeMoneyBalance = getDynamicBalance('Orange Money', 0);
+  const mtnMoneyBalance = getDynamicBalance('MTN Money', 0);
+  const bankBalance = getDynamicBalance('Virement', 0);
+  const cashBalance = getDynamicBalance('Espèces', 0);
 
   // Balances
   const channels = [
