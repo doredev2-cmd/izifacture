@@ -218,8 +218,8 @@ export default function DashboardPage() {
 
   const handleAddCompany = async (newCompany: Company) => {
     try {
-      const { userId, ...companyWithoutUser } = newCompany as any;
-      const { error } = await supabase.from('companies').insert([companyWithoutUser]);
+      const companyWithUser = { ...newCompany, userId: user?.id };
+      const { error } = await supabase.from('companies').insert([companyWithUser]);
       if (error) console.warn('Supabase insert error:', error);
     } catch (error: any) {
       console.warn('Supabase insert error:', error);
@@ -235,8 +235,7 @@ export default function DashboardPage() {
 
   const handleEditCompany = async (updatedCompany: Company) => {
     try {
-      const { userId, ...companyWithoutUser } = updatedCompany as any;
-      const { error } = await supabase.from('companies').update(companyWithoutUser).eq('id', updatedCompany.id);
+      const { error } = await supabase.from('companies').update(updatedCompany).eq('id', updatedCompany.id);
       if (error) console.warn('Supabase update error:', error);
     } catch (error: any) {
       console.warn('Supabase update error:', error);
@@ -345,13 +344,12 @@ export default function DashboardPage() {
         let qTransactions = supabase.from('transactions').select('*');
 
         // Isolation des données (sauf pour admin)
-        // Les tables ne contiennent actuellement pas de colonne userId ou user_id dans Supabase.
-        // if (role !== 'admin') {
-        //   qCompanies = qCompanies.eq('userId', user.id);
-        //   qClients = qClients.eq('userId', user.id);
-        //   qInvoices = qInvoices.eq('userId', user.id);
-        //   qTransactions = qTransactions.eq('userId', user.id);
-        // }
+        if (role !== 'admin') {
+          qCompanies = qCompanies.eq('userId', user.id);
+          qClients = qClients.eq('userId', user.id);
+          qInvoices = qInvoices.eq('userId', user.id);
+          qTransactions = qTransactions.eq('userId', user.id);
+        }
 
         const { data: companiesData } = await qCompanies;
         if (companiesData && companiesData.length > 0) {
@@ -477,6 +475,7 @@ export default function DashboardPage() {
     try {
       const { error } = await supabase.from('invoices').upsert({
         id: savedInv.id,
+        userId: user?.id,
         companyId: savedInv.companyId || activeCompany.id,
         invoiceNumber: savedInv.invoiceNumber,
         clientId: savedInv.clientId,
@@ -534,8 +533,8 @@ export default function DashboardPage() {
   
   const handleAddTransaction = async (newTx: Transaction) => {
     try {
-      const { userId, ...txWithoutUser } = newTx as any;
-      const { error } = await supabase.from('transactions').insert([txWithoutUser]);
+      const txWithUser = { ...newTx, userId: user?.id };
+      const { error } = await supabase.from('transactions').insert([txWithUser]);
       if (error) throw error;
       setTransactions(prev => [newTx, ...prev]);
       
@@ -598,8 +597,8 @@ export default function DashboardPage() {
   // Handlers for Client management
   const handleAddClient = async (newCli: Client) => {
     try {
-      const { userId, ...clientWithoutUser } = newCli as any;
-      const { error } = await supabase.from('clients').insert([clientWithoutUser]);
+      const clientWithUser = { ...newCli, userId: user?.id };
+      const { error } = await supabase.from('clients').insert([clientWithUser]);
       if (error) throw error;
       setClients([...clients, newCli]);
       showToast(`Client "${newCli.name}" ajouté avec succès.`, 'success');
@@ -620,8 +619,7 @@ export default function DashboardPage() {
 
   const handleEditClient = async (updatedCli: Client) => {
     try {
-      const { userId, ...clientWithoutUser } = updatedCli as any;
-      const { error } = await supabase.from('clients').update(clientWithoutUser).eq('id', updatedCli.id);
+      const { error } = await supabase.from('clients').update(updatedCli).eq('id', updatedCli.id);
       if (error) throw error;
       setClients(clients.map(cli => cli.id === updatedCli.id ? updatedCli : cli));
       showToast(`Fiche client de "${updatedCli.name}" modifiée.`, 'success');
