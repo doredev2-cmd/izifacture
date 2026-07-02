@@ -355,18 +355,54 @@ export default function DashboardPage() {
           promises.push(supabase.from('transactions').select('*'));
         }
 
-        const [
-          { data: companiesData },
-          { data: clientsData },
-          { data: invoicesData },
-          { data: transactionsData }
-        ] = await Promise.all(promises);
+        const responses = await Promise.all(promises);
+        
+        const companiesData = responses[0]?.data;
+        const clientsData = responses[1]?.data;
+        const invoicesData = responses[2]?.data;
+        const transactionsData = responses[3]?.data;
 
-        if (companiesData && companiesData.length > 0) {
-          setCompanies(companiesData);
-          const activeId = storedActiveCompanyId ? JSON.parse(storedActiveCompanyId) : companiesData[0].id;
-          const activeComp = companiesData.find((c: Company) => c.id === activeId) || companiesData[0];
-          setActiveCompany(activeComp);
+        if (responses[0]?.data && responses[0].data.length > 0) {
+          const comps = responses[0].data;
+          setCompanies(comps);
+          // try to restore active from localstorage
+          const savedActive = localStorage.getItem('izi_active_company_id');
+          if (savedActive) {
+            try {
+              const parsed = JSON.parse(savedActive);
+              const found = comps.find((c: any) => c.id === parsed);
+              if (found) {
+                setActiveCompany(found);
+              } else {
+                setActiveCompany(comps[0]);
+              }
+            } catch (e) {
+              setActiveCompany(comps[0]);
+            }
+          } else {
+            setActiveCompany(comps[0]);
+          }
+        } else if (user) {
+          // Auto-create a default company if none exists
+          const defaultCompanyId = `co-${Date.now()}`;
+          const newCompany: Company = {
+            id: defaultCompanyId,
+            name: 'Mon Entreprise',
+            email: user.email || '',
+            currency: 'GNF',
+            address: 'Adresse non définie',
+            logo: '🏢'
+          };
+          const companyWithUser = { ...newCompany, userId: user.id };
+          const { data: dbCompany, error: createErr } = await supabase.from('companies').insert([companyWithUser]).select().single();
+          if (!createErr && dbCompany) {
+            const finalCompany = { ...newCompany, ...dbCompany };
+            setCompanies([finalCompany]);
+            setActiveCompany(finalCompany);
+          } else {
+            setCompanies([]);
+            setActiveCompany(defaultEmptyCompany);
+          }
         } else {
           setCompanies([]);
           setActiveCompany(defaultEmptyCompany);
@@ -413,9 +449,17 @@ export default function DashboardPage() {
   }, [notifications]);
 
   // Sync active company from updated companies list
-  const handleUpdateCompany = (updatedCompany: Company) => {
-    setActiveCompany(updatedCompany);
-    setCompanies(companies.map(c => c.id === updatedCompany.id ? updatedCompany : c));
+  const handleUpdateCompany = async (updatedCompany: Company) => {
+    try {
+      const companyWithUser = { ...updatedCompany, userId: user?.id };
+      const { data: dbCompany, error } = await supabase.from('companies').upsert([companyWithUser]).select().single();
+      if (error) throw error;
+      const finalCompany = { ...updatedCompany, ...dbCompany };
+      setActiveCompany(finalCompany);
+      setCompanies(companies.map(c => c.id === finalCompany.id ? finalCompany : c));
+    } catch (error: any) {
+      showToast(`Erreur mise à jour entreprise : ${error.message}`, 'error');
+    }
   };
 
   // Filter invoices based on active company
@@ -482,7 +526,7 @@ export default function DashboardPage() {
     const exists = invoices.some(inv => inv.id === savedInv.id);
     const oldInv = invoices.find(inv => inv.id === savedInv.id);
     try {
-      const { error } = await supabase.from('invoices').upsert({
+      const { data: dbInv, error } = await supabase.from('invoices').upsert({
         id: savedInv.id,
         userId: user?.id,
         companyId: savedInv.companyId || activeCompany.id,
@@ -499,8 +543,10 @@ export default function DashboardPage() {
         amount: savedInv.amount,
         status: savedInv.status,
         paymentMethod: savedInv.paymentMethod
-      });
+      }).select().single();
       if (error) throw error;
+      
+      const finalInv = { ...savedInv, ...dbInv };
 
       // Gérer la transaction liée
       if (savedInv.status === 'paid') {
@@ -542,16 +588,16 @@ export default function DashboardPage() {
       }
 
       if (exists) {
-        setInvoices(invoices.map(inv => inv.id === savedInv.id ? savedInv : inv));
-        showToast(`✅ La facture ${savedInv.invoiceNumber} a été mise à jour et le portefeuille a été actualisé !`, 'success');
+        setInvoices(invoices.map(inv => inv.id === finalInv.id ? finalInv : inv));
+        showToast(`✅ La facture ${finalInv.invoiceNumber} a été mise à jour et le portefeuille a été actualisé !`, 'success');
       } else {
-        setInvoices([savedInv, ...invoices]);
-        showToast(`✅ Excellente nouvelle ! La facture ${savedInv.invoiceNumber} a été générée et sauvegardée en toute sécurité.`, 'success');
+        setInvoices([finalInv, ...invoices]);
+        showToast(`✅ Excellente nouvelle ! La facture ${finalInv.invoiceNumber} a été générée et sauvegardée en toute sécurité.`, 'success');
         
         // Auto add notification
         const newNotif = {
           id: `notif-${Date.now()}`,
-          text: `Nouvelle facture ${savedInv.invoiceNumber} générée pour ${savedInv.clientName}`,
+          text: `Nouvelle facture ${finalInv.invoiceNumber} générée pour ${finalInv.clientName}`,
           date: "À l'instant",
           read: false,
           type: 'info'
@@ -587,17 +633,18 @@ export default function DashboardPage() {
   const handleAddTransaction = async (newTx: Transaction) => {
     try {
       const txWithUser = { ...newTx, userId: user?.id };
-      const { error } = await supabase.from('transactions').insert([txWithUser]);
+      const { data: dbTx, error } = await supabase.from('transactions').insert([txWithUser]).select().single();
       if (error) throw error;
-      setTransactions(prev => [newTx, ...prev]);
+      const finalTx = { ...newTx, ...dbTx };
+      setTransactions(prev => [finalTx, ...prev]);
       
       // Log notification
       const newNotif = {
         id: `notif-${Date.now()}`,
-        text: `${newTx.description} (${formatFCFA(newTx.amount, activeCompany.currency)}) via ${newTx.method}`,
+        text: `${finalTx.description} (${formatFCFA(finalTx.amount, activeCompany.currency)}) via ${finalTx.method}`,
         date: "À l'instant",
         read: false,
-        type: newTx.type === 'credit' ? 'success' : 'info'
+        type: finalTx.type === 'credit' ? 'success' : 'info'
       };
       setNotifications(prev => [newNotif, ...prev]);
       
@@ -659,10 +706,11 @@ export default function DashboardPage() {
   const handleAddClient = async (newCli: Client) => {
     try {
       const clientWithUser = { ...newCli, userId: user?.id };
-      const { error } = await supabase.from('clients').insert([clientWithUser]);
+      const { data: dbCli, error } = await supabase.from('clients').insert([clientWithUser]).select().single();
       if (error) throw error;
-      setClients([...clients, newCli]);
-      showToast(`Client "${newCli.name}" ajouté avec succès.`, 'success');
+      const finalCli = { ...newCli, ...dbCli };
+      setClients([...clients, finalCli]);
+      showToast(`Client "${finalCli.name}" ajouté avec succès.`, 'success');
       
       // Notification
       const newNotif = {
@@ -680,10 +728,11 @@ export default function DashboardPage() {
 
   const handleEditClient = async (updatedCli: Client) => {
     try {
-      const { error } = await supabase.from('clients').update(updatedCli).eq('id', updatedCli.id);
+      const { data: dbCli, error } = await supabase.from('clients').update(updatedCli).eq('id', updatedCli.id).select().single();
       if (error) throw error;
-      setClients(clients.map(cli => cli.id === updatedCli.id ? updatedCli : cli));
-      showToast(`Fiche client de "${updatedCli.name}" modifiée.`, 'success');
+      const finalCli = { ...updatedCli, ...dbCli };
+      setClients(clients.map(cli => cli.id === finalCli.id ? finalCli : cli));
+      showToast(`Fiche client de "${finalCli.name}" modifiée.`, 'success');
       
       // Update client names & emails in invoices list for consistency
       setInvoices(invoices.map(inv => {
