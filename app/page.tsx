@@ -60,6 +60,7 @@ export default function DashboardPage() {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [isResetMode, setIsResetMode] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   useEffect(() => {
@@ -336,22 +337,31 @@ export default function DashboardPage() {
 
     const fetchData = async () => {
       try {
+        setIsDataLoading(true);
         const storedActiveCompanyId = typeof window !== 'undefined' ? localStorage.getItem('izi_active_company_id') : null;
 
-        let qCompanies = supabase.from('companies').select('*');
-        let qClients = supabase.from('clients').select('*');
-        let qInvoices = supabase.from('invoices').select('*');
-        let qTransactions = supabase.from('transactions').select('*');
-
+        const promises = [];
+        
         // Isolation des données (sauf pour admin)
         if (role !== 'admin') {
-          qCompanies = qCompanies.eq('userId', user.id);
-          qClients = qClients.eq('userId', user.id);
-          qInvoices = qInvoices.eq('userId', user.id);
-          qTransactions = qTransactions.eq('userId', user.id);
+          promises.push(supabase.from('companies').select('*').eq('userId', user.id));
+          promises.push(supabase.from('clients').select('*').eq('userId', user.id));
+          promises.push(supabase.from('invoices').select('*').eq('userId', user.id));
+          promises.push(supabase.from('transactions').select('*').eq('userId', user.id));
+        } else {
+          promises.push(supabase.from('companies').select('*'));
+          promises.push(supabase.from('clients').select('*'));
+          promises.push(supabase.from('invoices').select('*'));
+          promises.push(supabase.from('transactions').select('*'));
         }
 
-        const { data: companiesData } = await qCompanies;
+        const [
+          { data: companiesData },
+          { data: clientsData },
+          { data: invoicesData },
+          { data: transactionsData }
+        ] = await Promise.all(promises);
+
         if (companiesData && companiesData.length > 0) {
           setCompanies(companiesData);
           const activeId = storedActiveCompanyId ? JSON.parse(storedActiveCompanyId) : companiesData[0].id;
@@ -362,16 +372,14 @@ export default function DashboardPage() {
           setActiveCompany(defaultEmptyCompany);
         }
 
-        const { data: clientsData } = await qClients;
         if (clientsData) setClients(clientsData);
-
-        const { data: invoicesData } = await qInvoices;
         if (invoicesData) setInvoices(invoicesData);
-
-        const { data: transactionsData } = await qTransactions;
         if (transactionsData) setTransactions(transactionsData);
+        
       } catch (error) {
         console.error("Error fetching data from Supabase:", error);
+      } finally {
+        setIsDataLoading(false);
       }
     };
     
@@ -983,8 +991,19 @@ export default function DashboardPage() {
       {/* Main Content Area */}
       <main className="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto w-full max-w-[1600px] mx-auto">
         
-        {/* Dynamic Tab Renderer */}
-        {activeTab === 'dashboard' && (
+        {isDataLoading ? (
+          <div className="flex flex-col items-center justify-center h-full min-h-[60vh] gap-4">
+            <div className="animate-spin text-blue-600 dark:text-blue-500">
+               <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+               </svg>
+            </div>
+            <p className="text-sm font-medium text-slate-500 dark:text-zinc-400 animate-pulse">Chargement de vos données...</p>
+          </div>
+        ) : (
+          <>
+            {/* Dynamic Tab Renderer */}
+            {activeTab === 'dashboard' && (
           <div className="space-y-6 animate-in fade-in duration-200">
             {/* Top Header Row */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200/60 dark:border-zinc-800/60 relative">
@@ -1409,6 +1428,8 @@ export default function DashboardPage() {
           <AdminDashboard showToast={showToast} />
         )}
 
+          </>
+        )}
       </main>
     </div>
   );
