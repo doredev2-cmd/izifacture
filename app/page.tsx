@@ -218,8 +218,8 @@ export default function DashboardPage() {
 
   const handleAddCompany = async (newCompany: Company) => {
     try {
-      const companyWithUser = { ...newCompany, userId: user?.id };
-      const { error } = await supabase.from('companies').insert([companyWithUser]);
+      const { userId, ...companyWithoutUser } = newCompany as any;
+      const { error } = await supabase.from('companies').insert([companyWithoutUser]);
       if (error) console.warn('Supabase insert error:', error);
     } catch (error: any) {
       console.warn('Supabase insert error:', error);
@@ -235,7 +235,8 @@ export default function DashboardPage() {
 
   const handleEditCompany = async (updatedCompany: Company) => {
     try {
-      const { error } = await supabase.from('companies').update(updatedCompany).eq('id', updatedCompany.id);
+      const { userId, ...companyWithoutUser } = updatedCompany as any;
+      const { error } = await supabase.from('companies').update(companyWithoutUser).eq('id', updatedCompany.id);
       if (error) console.warn('Supabase update error:', error);
     } catch (error: any) {
       console.warn('Supabase update error:', error);
