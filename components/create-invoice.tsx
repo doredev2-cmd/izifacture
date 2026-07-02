@@ -26,7 +26,7 @@ interface CreateInvoiceProps {
   clients: Client[];
   activeCompany: Company;
   invoiceToEdit?: Invoice | null;
-  onSave: (invoice: Invoice) => void;
+  onSave: (invoice: Invoice) => Promise<boolean> | void | any;
   onCancel: () => void;
   showToast?: (message: string, type: 'success' | 'error' | 'info') => void;
 }
@@ -60,6 +60,7 @@ export default function CreateInvoice({
   const [sendContact, setSendContact] = useState<string>('');
   const [isSending, setIsSending] = useState<boolean>(false);
   const [sendSuccess, setSendSuccess] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // Sync selectedCompany when activeCompany changes
   useEffect(() => {
@@ -184,14 +185,14 @@ export default function CreateInvoice({
     return getSubtotal() - getDiscountAmount() + getTaxAmount();
   };
 
-  const handleSave = (status: 'draft' | 'sent') => {
+  const handleSave = async (status: 'draft' | 'sent') => {
     let client = clients.find(c => c.id === selectedClient);
     if (!client && clients.length > 0) {
       client = clients[0];
     }
     if (!client) {
       alert("Veuillez d'abord sélectionner ou ajouter un client.");
-      return;
+      return false;
     }
 
     // Format dates back to DD/MM/YYYY
@@ -222,7 +223,15 @@ export default function CreateInvoice({
       paymentMethod: paymentMethod
     };
 
-    onSave(newInvoice);
+    setIsSaving(true);
+    try {
+      const result = await onSave(newInvoice);
+      setIsSaving(false);
+      return result !== false;
+    } catch (error) {
+      setIsSaving(false);
+      return false;
+    }
   };
 
   const activeCompObj = allCompanies.find(c => c.id === selectedCompany) || activeCompany;
@@ -621,20 +630,24 @@ export default function CreateInvoice({
           <div className="flex items-center justify-between gap-3 p-4 bg-slate-50 dark:bg-zinc-950 border border-slate-100 dark:border-zinc-850 rounded-2xl">
             <button
               onClick={onCancel}
-              className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 dark:text-zinc-450 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-900 rounded-xl transition-all cursor-pointer"
+              disabled={isSaving}
+              className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 dark:text-zinc-450 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-900 rounded-xl transition-all cursor-pointer disabled:opacity-50"
             >
               Annuler
             </button>
             <div className="flex gap-2">
               <button
+                disabled={isSaving}
                 onClick={() => handleSave('draft')}
-                className="px-4 py-2.5 text-xs font-bold bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 rounded-xl transition-all cursor-pointer shadow-sm"
+                className="px-4 py-2.5 text-xs font-bold bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 rounded-xl transition-all cursor-pointer shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                {isSaving && <div className="w-3.5 h-3.5 border-2 border-slate-400 dark:border-zinc-500 border-t-transparent rounded-full animate-spin" />}
                 Enregistrer
               </button>
               <button
+                disabled={isSaving || isSending}
                 onClick={() => setShowSendModal(true)}
-                className="px-4 py-2.5 text-xs font-bold bg-blue-600 dark:bg-blue-650 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1.5"
+                className="px-4 py-2.5 text-xs font-bold bg-blue-600 dark:bg-blue-650 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send size={14} /> Générer & Transmettre
               </button>
@@ -913,23 +926,27 @@ export default function CreateInvoice({
                       Retour
                     </button>
                     <button 
-                      onClick={() => {
+                      disabled={isSending || !sendContact}
+                      onClick={async () => {
                         setIsSending(true);
-                        setTimeout(() => {
-                          setIsSending(false);
+                        const success = await handleSave('sent');
+                        if (success) {
                           setSendSuccess(true);
                           setTimeout(() => {
                             setSendSuccess(false);
                             setShowSendModal(false);
                             setSendMethod(null);
-                            handleSave('sent');
+                            setIsSending(false);
                             if (showToast) {
                               showToast(`Facture transmise avec succès à ${activeCliObj?.name}.`, 'success');
                             }
                           }, 2000);
-                        }, 1500);
+                        } else {
+                          setIsSending(false);
+                          setShowSendModal(false);
+                          setSendMethod(null);
+                        }
                       }}
-                      disabled={!sendContact}
                       className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md transition-all flex justify-center items-center gap-2 cursor-pointer"
                     >
                       <Send size={14} /> Envoyer

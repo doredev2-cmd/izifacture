@@ -220,34 +220,36 @@ export default function DashboardPage() {
   const handleAddCompany = async (newCompany: Company) => {
     try {
       const companyWithUser = { ...newCompany, userId: user?.id };
-      const { error } = await supabase.from('companies').insert([companyWithUser]);
-      if (error) console.warn('Supabase insert error:', error);
+      const { data: dbCompany, error } = await supabase.from('companies').insert([companyWithUser]).select().single();
+      if (error) throw error;
+      
+      const finalCompany = { ...newCompany, ...dbCompany };
+      setCompanies([...companies, finalCompany]);
+      if (activeCompany.id === '') {
+        setActiveCompany(finalCompany);
+      }
+      showToast(`Entreprise "${finalCompany.name}" créée avec succès.`, 'success');
     } catch (error: any) {
       console.warn('Supabase insert error:', error);
+      showToast(`Erreur création entreprise: ${error.message}`, 'error');
     }
-    
-    // Always update local state
-    setCompanies([...companies, newCompany]);
-    if (activeCompany.id === '') {
-      setActiveCompany(newCompany);
-    }
-    showToast(`Entreprise "${newCompany.name}" créée avec succès.`, 'success');
   };
 
   const handleEditCompany = async (updatedCompany: Company) => {
     try {
-      const { error } = await supabase.from('companies').update(updatedCompany).eq('id', updatedCompany.id);
-      if (error) console.warn('Supabase update error:', error);
+      const { data: dbCompany, error } = await supabase.from('companies').update(updatedCompany).eq('id', updatedCompany.id).select().single();
+      if (error) throw error;
+      
+      const finalCompany = { ...updatedCompany, ...dbCompany };
+      setCompanies(companies.map(c => c.id === finalCompany.id ? finalCompany : c));
+      if (activeCompany.id === finalCompany.id) {
+        setActiveCompany(finalCompany);
+      }
+      showToast(`Entreprise "${finalCompany.name}" mise à jour avec succès.`, 'success');
     } catch (error: any) {
       console.warn('Supabase update error:', error);
+      showToast(`Erreur mise à jour entreprise: ${error.message}`, 'error');
     }
-    
-    // Always update local state
-    setCompanies(companies.map(c => c.id === updatedCompany.id ? updatedCompany : c));
-    if (activeCompany.id === updatedCompany.id) {
-      setActiveCompany(updatedCompany);
-    }
-    showToast(`Entreprise "${updatedCompany.name}" mise à jour.`, 'success');
   };
 
   const handleDeleteCompany = async (id: string) => {
@@ -606,8 +608,10 @@ export default function DashboardPage() {
       }
       setActiveTab('invoices');
       setSelectedInvoice(null);
+      return true;
     } catch (error: any) {
       showToast(`❌ Échec de l'enregistrement en ligne. Détail : ${error.message}`, 'error');
+      return false;
     }
   };
 
