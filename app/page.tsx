@@ -166,7 +166,10 @@ export default function DashboardPage() {
           if (error.message.includes('Email not confirmed')) {
             throw new Error('Veuillez confirmer votre adresse email avant de vous connecter.');
           }
-          throw error;
+          if (error.message.toLowerCase().includes('fetch') || error.message.toLowerCase().includes('network') || error.message.toLowerCase().includes('failed')) {
+            throw new Error('Erreur de connexion réseau. Vérifiez votre connexion internet et réessayez.');
+          }
+          throw new Error(error.message);
         }
         
         showToast(`Bienvenue de retour !`, "success");
@@ -180,7 +183,8 @@ export default function DashboardPage() {
           email: loginEmail,
           password: loginPassword,
           options: {
-            data: { name: loginName }
+            data: { name: loginName },
+            emailRedirectTo: `${window.location.origin}/auth/callback`
           }
         });
         
@@ -206,7 +210,12 @@ export default function DashboardPage() {
         }
       }
     } catch (error: any) {
-      showToast(error.message, "error");
+      const msg: string = error?.message || '';
+      if (msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('networkerror') || msg.toLowerCase().includes('failed to fetch') || msg === 'Failed to fetch') {
+        showToast("Erreur de connexion réseau. Vérifiez votre connexion internet et réessayez.", "error");
+      } else {
+        showToast(msg || "Une erreur inattendue s'est produite.", "error");
+      }
     } finally {
       setIsSubmitting(false);
     }
