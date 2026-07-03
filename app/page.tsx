@@ -260,7 +260,8 @@ export default function DashboardPage() {
       }
       showToast(`Entreprise "${finalCompany.name}" créée avec succès.`, 'success');
     } catch (error: any) {
-      console.warn('Supabase insert error:', error);
+      console.error('Supabase insert error:', error);
+      alert(`Erreur création entreprise détaillée : ${error.message || JSON.stringify(error)}`);
       showToast(`Erreur création entreprise: ${error.message}`, 'error');
     }
   };
