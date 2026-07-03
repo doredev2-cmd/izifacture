@@ -151,6 +151,12 @@ export default function DashboardPage() {
     
     setIsSubmitting(true);
     
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      setIsSubmitting(false);
+      showToast("Erreur Vercel : Variables d'environnement Supabase introuvables. Ajoutez-les dans le dashboard Vercel.", "error");
+      return;
+    }
+    
     try {
       if (isLoginMode) {
         // Sign In
