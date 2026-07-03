@@ -314,14 +314,12 @@ export default function Sidebar({
             <div className="absolute left-6 right-6 mt-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl shadow-premium z-50 py-1.5 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-100">
               <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 dark:text-zinc-550 uppercase tracking-wider border-b border-slate-55 dark:border-zinc-850/60 flex justify-between items-center">
                 <span>Mes Entreprises</span>
-                {role === 'admin' && (
-                  <button 
-                    onClick={handleOpenAddCompany}
-                    className="text-[10px] font-extrabold text-blue-600 dark:text-blue-455 hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <Plus size={10} /> Ajouter
-                  </button>
-                )}
+                <button 
+                  onClick={handleOpenAddCompany}
+                  className="text-[10px] font-extrabold text-blue-600 dark:text-blue-455 hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <Plus size={10} /> Ajouter
+                </button>
               </div>
               <div className="max-h-60 overflow-y-auto divide-y divide-slate-50 dark:divide-zinc-850/40">
                 {companies.map((company) => (
@@ -352,24 +350,22 @@ export default function Sidebar({
                     </button>
                     
                     {/* Hover actions for company */}
-                    {role === 'admin' && (
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={(e) => handleOpenEditCompany(e, company)}
-                          className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-455 rounded hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
-                          title="Modifier l'entreprise"
-                        >
-                          <Edit size={12} />
-                        </button>
-                        <button
-                          onClick={(e) => handleOpenDeleteCompany(e, company.id)}
-                          className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
-                          title="Supprimer l'entreprise"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => handleOpenEditCompany(e, company)}
+                        className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-455 rounded hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+                        title="Modifier l'entreprise"
+                      >
+                        <Edit size={12} />
+                      </button>
+                      <button
+                        onClick={(e) => handleOpenDeleteCompany(e, company.id)}
+                        className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+                        title="Supprimer l'entreprise"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
