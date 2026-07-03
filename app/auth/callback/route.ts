@@ -1,55 +1,51 @@
-import { createServerClient } from '@supabase/ssr';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import type { CookieOptions } from '@supabase/ssr';
+import { NextResponse } from 'next/server'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
-export async function GET(request: NextRequest) {
-  const requestUrl = new URL(request.url);
-  const code = requestUrl.searchParams.get('code');
-  const token_hash = requestUrl.searchParams.get('token_hash');
-  const type = requestUrl.searchParams.get('type');
-  const next = requestUrl.searchParams.get('next') ?? '/';
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url)
+  const code = searchParams.get('code')
+  // if "next" is in param, use it as the redirect URL
+  const next = searchParams.get('next') ?? '/'
 
-  const response = NextResponse.redirect(new URL(next, requestUrl.origin));
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          response.cookies.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          response.cookies.set({ name, value: '', ...options });
-        },
-      },
-    }
-  );
-
-  // Handle email confirmation with token_hash (Supabase OTP flow)
-  if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({
-      type: type as 'signup' | 'recovery' | 'email' | 'invite' | 'magiclink' | 'sms' | 'phone_change' | 'email_change',
-      token_hash,
-    });
-
-    if (!error) {
-      return response;
-    }
-  }
-
-  // Handle OAuth / magic link with code (PKCE flow)
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            try {
+              cookieStore.set({ name, value, ...options })
+            } catch (error) {
+              // The `set` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+          remove(name: string, options: CookieOptions) {
+            try {
+              cookieStore.delete({ name, ...options })
+            } catch (error) {
+              // The `delete` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+        },
+      }
+    )
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    
     if (!error) {
-      return response;
+      return NextResponse.redirect(`${origin}${next}`)
     }
   }
 
-  // Fallback - redirect to home anyway (session may still be valid client-side)
-  return NextResponse.redirect(new URL('/', requestUrl.origin));
+  // return the user to an error page with instructions
+  return NextResponse.redirect(`${origin}/?error=auth-callback-failed`)
 }

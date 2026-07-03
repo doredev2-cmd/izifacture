@@ -152,30 +152,44 @@ export default function DashboardPage() {
     setIsSubmitting(true);
     
     try {
-      // Debug: verify env vars are loaded
-      console.log('[IziFacture Auth] Supabase URL configured:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
-      console.log('[IziFacture Auth] Supabase URL value starts with:', process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30));
-
       if (isLoginMode) {
         // Sign In
+        // Vérification Rate Limiting (5 tentatives / 30 min)
+        const thirtyMinsAgo = new Date(Date.now() - 30 * 60000).toISOString();
+        const { data: recentAttempts } = await supabase
+          .from('login_attempts')
+          .select('id, successful')
+          .eq('email', loginEmail)
+          .gte('attempt_time', thirtyMinsAgo)
+          .order('attempt_time', { ascending: false });
+
+        if (recentAttempts && recentAttempts.length >= 5) {
+          const firstSuccessIndex = recentAttempts.findIndex((a: any) => a.successful);
+          const failedCount = firstSuccessIndex === -1 ? recentAttempts.length : firstSuccessIndex;
+          if (failedCount >= 5) {
+            throw new Error('Vous avez dépassé le nombre maximal de tentatives de connexion. Pour votre sécurité, votre compte est temporairement verrouillé. Veuillez réessayer dans 30 minutes ou utiliser la fonction "Mot de passe oublié" si nécessaire.');
+          }
+        }
+
         const { data, error } = await supabase.auth.signInWithPassword({
           email: loginEmail,
           password: loginPassword
         });
-
+        
+        // Enregistrement de la tentative
+        await supabase.from('login_attempts').insert({
+          email: loginEmail,
+          successful: !error
+        });
+        
         if (error) {
-          // Log full error for debugging
-          console.error('[IziFacture Auth] signInWithPassword error:', JSON.stringify(error), error);
           if (error.message.includes('Invalid login credentials')) {
             throw new Error('Email ou mot de passe incorrect.');
           }
           if (error.message.includes('Email not confirmed')) {
             throw new Error('Veuillez confirmer votre adresse email avant de vous connecter.');
           }
-          if (error.message.toLowerCase().includes('fetch') || error.message.toLowerCase().includes('network') || error.message.toLowerCase().includes('failed')) {
-            throw new Error(`Impossible de contacter le serveur d'authentification. Vérifiez que le projet Supabase est actif. (${error.message})`);
-          }
-          throw new Error(error.message);
+          throw error;
         }
         
         showToast(`Bienvenue de retour !`, "success");
@@ -189,8 +203,7 @@ export default function DashboardPage() {
           email: loginEmail,
           password: loginPassword,
           options: {
-            data: { name: loginName },
-            emailRedirectTo: `${window.location.origin}/auth/callback`
+            data: { name: loginName }
           }
         });
         
@@ -216,12 +229,7 @@ export default function DashboardPage() {
         }
       }
     } catch (error: any) {
-      const msg: string = error?.message || '';
-      if (msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('networkerror') || msg.toLowerCase().includes('failed to fetch') || msg === 'Failed to fetch') {
-        showToast("Erreur de connexion réseau. Vérifiez votre connexion internet et réessayez.", "error");
-      } else {
-        showToast(msg || "Une erreur inattendue s'est produite.", "error");
-      }
+      showToast(error.message, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -437,7 +445,7 @@ export default function DashboardPage() {
     };
     
     fetchData();
-  }, [user, role]);
+  }, [user?.id, role]);
 
   // Note: we removed localstorage syncing for database models (companies, invoices, clients, transactions)
   // because we will directly mutate Supabase, but we keep active company preference in local storage.

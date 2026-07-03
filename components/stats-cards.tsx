@@ -16,7 +16,7 @@ interface StatsCardsProps {
   currency?: string;
 }
 
-export default function StatsCards({ invoices, currency = 'GNF' }: StatsCardsProps) {
+const StatsCards = ({ invoices, currency = 'GNF' }: StatsCardsProps) => {
   // Calculations
   const totalCount = invoices.length;
   
@@ -116,3 +116,5 @@ export default function StatsCards({ invoices, currency = 'GNF' }: StatsCardsPro
     </div>
   );
 }
+
+export default React.memo(StatsCards);

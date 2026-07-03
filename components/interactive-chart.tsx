@@ -7,7 +7,7 @@ interface InteractiveChartProps {
   currency?: string;
 }
 
-export default function InteractiveChart({ currency = 'GNF' }: InteractiveChartProps) {
+const InteractiveChart = ({ currency = 'GNF' }: InteractiveChartProps) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const svgRef = useRef<SVGSVGElement>(null);
@@ -264,3 +264,5 @@ export default function InteractiveChart({ currency = 'GNF' }: InteractiveChartP
     </div>
   );
 }
+
+export default React.memo(InteractiveChart);
