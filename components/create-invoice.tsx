@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, 
-  Trash2, 
-  Eye, 
-  Download, 
-  Mail, 
-  ArrowLeft, 
-  Check, 
+import {
+  Plus,
+  Trash2,
+  Eye,
+  Download,
+  Mail,
+  ArrowLeft,
+  Check,
   FileText,
   DollarSign,
   Calendar,
@@ -80,7 +80,7 @@ export default function CreateInvoice({
     // Current date in YYYY-MM-DD
     const today = new Date();
     const formattedToday = today.toISOString().split('T')[0];
-    
+
     // Default due date (30 days from now)
     const thirtyDaysLater = new Date();
     thirtyDaysLater.setDate(today.getDate() + 30);
@@ -90,7 +90,7 @@ export default function CreateInvoice({
       setInvoiceType('standard');
       const client = clients.find(c => c.name === invoiceToEdit.clientName || c.email === invoiceToEdit.clientEmail);
       if (client) setSelectedClient(client.id);
-      
+
       // Parse dates from DD/MM/YYYY to YYYY-MM-DD
       const parseDate = (dStr: string) => {
         const parts = dStr.split('/');
@@ -99,7 +99,7 @@ export default function CreateInvoice({
         }
         return formattedToday;
       };
-      
+
       setIssueDate(parseDate(invoiceToEdit.issueDate));
       setDueDate(parseDate(invoiceToEdit.dueDate));
       setInvoiceNumber(invoiceToEdit.invoiceNumber);
@@ -115,11 +115,11 @@ export default function CreateInvoice({
     } else {
       setIssueDate(formattedToday);
       setDueDate(formattedDue);
-      
+
       // Generate standard invoice number (random for mock)
       const randomNum = Math.floor(100 + Math.random() * 900);
       setInvoiceNumber(`#INV-2026-${randomNum}`);
-      
+
       // Default item line
       setItems([
         { id: 'item-new-1', description: 'Prestation de services digitaux', quantity: 1, unitPrice: 1500000, taxPercent: 18 }
@@ -242,7 +242,7 @@ export default function CreateInvoice({
       {/* Header with back button */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200/60 dark:border-zinc-800/60">
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={onCancel}
             className="p-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-850 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all"
           >
@@ -267,15 +267,13 @@ export default function CreateInvoice({
           {/* Show Preview switch */}
           <div className="flex items-center gap-2 bg-slate-100 dark:bg-zinc-900 px-3 py-1.5 rounded-xl border border-slate-200/65 dark:border-zinc-800 text-xs font-semibold">
             <span className="text-slate-600 dark:text-zinc-400">Aperçu en direct</span>
-            <button 
+            <button
               onClick={() => setShowPreview(!showPreview)}
-              className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                showPreview ? 'bg-blue-600' : 'bg-slate-200 dark:bg-zinc-800'
-              }`}
+              className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${showPreview ? 'bg-blue-600' : 'bg-slate-200 dark:bg-zinc-800'
+                }`}
             >
-              <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
-                showPreview ? 'translate-x-4' : 'translate-x-0'
-              }`} />
+              <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${showPreview ? 'translate-x-4' : 'translate-x-0'
+                }`} />
             </button>
           </div>
         </div>
@@ -283,43 +281,40 @@ export default function CreateInvoice({
 
       {/* Main Grid: Form on the left, Live Preview on the right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
+
         {/* Form Container */}
         <div className={`${showPreview ? 'lg:col-span-7' : 'lg:col-span-12'} space-y-6`}>
-          
+
           {/* Invoice Type selection */}
           <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-slate-100 dark:border-zinc-850 shadow-soft">
             <div className="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-zinc-950/40 p-1 rounded-xl text-xs font-semibold">
-              <button 
+              <button
                 type="button"
                 onClick={() => setInvoiceType('standard')}
-                className={`py-2 rounded-lg text-center transition-all ${
-                  invoiceType === 'standard' 
-                    ? 'bg-white dark:bg-zinc-800 text-slate-900 dark:text-white shadow-sm font-bold' 
+                className={`py-2 rounded-lg text-center transition-all ${invoiceType === 'standard'
+                    ? 'bg-white dark:bg-zinc-800 text-slate-900 dark:text-white shadow-sm font-bold'
                     : 'text-slate-500 dark:text-zinc-450'
-                }`}
+                  }`}
               >
                 Standard
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={() => setInvoiceType('split')}
-                className={`py-2 rounded-lg text-center transition-all ${
-                  invoiceType === 'split' 
-                    ? 'bg-white dark:bg-zinc-800 text-slate-900 dark:text-white shadow-sm font-bold' 
+                className={`py-2 rounded-lg text-center transition-all ${invoiceType === 'split'
+                    ? 'bg-white dark:bg-zinc-800 text-slate-900 dark:text-white shadow-sm font-bold'
                     : 'text-slate-500 dark:text-zinc-450'
-                }`}
+                  }`}
               >
                 Divisée (Split)
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={() => setInvoiceType('recurring')}
-                className={`py-2 rounded-lg text-center transition-all ${
-                  invoiceType === 'recurring' 
-                    ? 'bg-white dark:bg-zinc-800 text-slate-900 dark:text-white shadow-sm font-bold' 
+                className={`py-2 rounded-lg text-center transition-all ${invoiceType === 'recurring'
+                    ? 'bg-white dark:bg-zinc-800 text-slate-900 dark:text-white shadow-sm font-bold'
                     : 'text-slate-500 dark:text-zinc-450'
-                }`}
+                  }`}
               >
                 Récurrente
               </button>
@@ -336,8 +331,8 @@ export default function CreateInvoice({
                     <label className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
                       Nombre d'échéances
                     </label>
-                    <select 
-                      value={splitPaymentsCount} 
+                    <select
+                      value={splitPaymentsCount}
                       onChange={(e) => setSplitPaymentsCount(parseInt(e.target.value))}
                       className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100 focus:outline-none"
                     >
@@ -364,7 +359,7 @@ export default function CreateInvoice({
                     <label className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
                       Fréquence
                     </label>
-                    <select 
+                    <select
                       value={recurrenceFrequency}
                       onChange={(e) => setRecurrenceFrequency(e.target.value)}
                       className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100 focus:outline-none"
@@ -378,7 +373,7 @@ export default function CreateInvoice({
                     <label className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
                       Date de fin (Optionnel)
                     </label>
-                    <input 
+                    <input
                       type="date"
                       value={recurrenceEndDate}
                       onChange={(e) => setRecurrenceEndDate(e.target.value)}
@@ -503,7 +498,7 @@ export default function CreateInvoice({
                   Prestations & Lignes de Facture
                 </h3>
               </div>
-              
+
               <div className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
                 Devise : {currency}
               </div>
@@ -514,7 +509,7 @@ export default function CreateInvoice({
               {items.map((item, index) => {
                 const lineTotal = item.quantity * item.unitPrice;
                 return (
-                  <div 
+                  <div
                     key={item.id}
                     className="p-4 rounded-xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/20 relative space-y-3"
                   >
@@ -523,7 +518,7 @@ export default function CreateInvoice({
                         Ligne {index + 1}
                       </span>
                       {items.length > 1 && (
-                        <button 
+                        <button
                           type="button"
                           onClick={() => handleRemoveItem(item.id)}
                           className="text-rose-600 hover:text-rose-700 dark:text-rose-400 p-1 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg transition-colors cursor-pointer"
@@ -659,20 +654,20 @@ export default function CreateInvoice({
         {/* Live Preview Column */}
         {showPreview && (
           <div className="lg:col-span-5 space-y-4 sticky top-6">
-            
+
             {/* Toolbar for preview actions */}
             <div className="flex items-center justify-between bg-white dark:bg-zinc-900 p-3.5 rounded-xl border border-slate-100 dark:border-zinc-850 shadow-soft">
               <span className="text-xs font-bold text-slate-800 dark:text-zinc-200">Aperçu Facture</span>
-              
+
               <div className="flex gap-1.5">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => handleSave('draft')}
                   className="inline-flex items-center gap-1 px-3 py-1.5 text-[10px] font-bold border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-850 rounded-lg transition-colors cursor-pointer"
                 >
                   <Mail size={12} /> Email
                 </button>
-                <button 
+                <button
                   type="button"
                   onClick={() => {
                     const client = clients.find(c => c.id === selectedClient);
@@ -712,11 +707,11 @@ export default function CreateInvoice({
 
             {/* A4 Paper mockup invoice container (New Professional Design) */}
             {/* A4 Paper mockup invoice container (Classic Clean Design with Blue/Black accents) */}
-            <div 
-              className="bg-white rounded-none shadow-premium w-full relative overflow-hidden flex flex-col justify-between mx-auto text-slate-800" 
+            <div
+              className="bg-white rounded-none shadow-premium w-full relative overflow-hidden flex flex-col justify-between mx-auto text-slate-800"
               style={{ minHeight: '842px', backgroundColor: 'white', padding: '40px 48px' }}
             >
-              
+
               <div className="flex-1 flex flex-col">
                 {/* Top Header Section */}
                 <div className="flex justify-between items-start mb-12">
@@ -776,7 +771,7 @@ export default function CreateInvoice({
                     <div className="w-[15%] text-center">QUANTITÉ</div>
                     <div className="w-[25%] text-right">TOTAL HT</div>
                   </div>
-                  
+
                   {/* Table Body */}
                   <div className="flex flex-col border-b border-slate-200 mb-6">
                     {items.map((item, index) => (
@@ -813,7 +808,7 @@ export default function CreateInvoice({
                       <span>Total TTC :</span>
                       <span>{formatFCFA(getTotalTTC(), currency)}</span>
                     </div>
-                    
+
                     {/* Dynamic Split / Recurring info inside preview */}
                     {invoiceType === 'split' && (
                       <div className="mt-2 text-[11px] font-bold text-blue-600 text-right">
@@ -831,7 +826,7 @@ export default function CreateInvoice({
                       <Check size={14} strokeWidth={3} /> Document signé électroniquement
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-col items-end gap-4">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">SIGNATURE DE L'ÉMETTEUR</span>
                     <span className="font-signature text-2xl text-[#1e2a47] opacity-90">{activeCompObj.name}</span>
@@ -860,7 +855,7 @@ export default function CreateInvoice({
                 Comment souhaitez-vous envoyer cette facture à <strong>{activeCliObj?.name || 'votre client'}</strong> ?
               </p>
             </div>
-            
+
             <div className="p-5 space-y-3 bg-slate-50/50 dark:bg-zinc-900/50">
               {sendSuccess ? (
                 <div className="py-6 flex flex-col items-center justify-center space-y-4 animate-in zoom-in duration-300">
@@ -881,7 +876,7 @@ export default function CreateInvoice({
                     <label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
                       {sendMethod === 'whatsapp' ? 'Numéro WhatsApp' : 'Adresse Email'}
                     </label>
-                    <input 
+                    <input
                       type={sendMethod === 'whatsapp' ? 'tel' : 'email'}
                       value={sendContact}
                       onChange={(e) => setSendContact(e.target.value)}
@@ -890,13 +885,13 @@ export default function CreateInvoice({
                     />
                   </div>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => setSendMethod(null)}
                       className="flex-1 py-2.5 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-slate-600 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
                     >
                       Retour
                     </button>
-                    <button 
+                    <button
                       disabled={isSending || !sendContact}
                       onClick={async () => {
                         setIsSending(true);
@@ -926,7 +921,7 @@ export default function CreateInvoice({
                 </div>
               ) : (
                 <>
-                  <button 
+                  <button
                     onClick={() => {
                       setSendMethod('whatsapp');
                       setSendContact(activeCliObj?.phone || '');
@@ -936,8 +931,8 @@ export default function CreateInvoice({
                     <MessageCircle size={18} />
                     Envoyer via WhatsApp
                   </button>
-                  
-                  <button 
+
+                  <button
                     onClick={() => {
                       setSendMethod('email');
                       setSendContact(activeCliObj?.email || '');
@@ -948,7 +943,7 @@ export default function CreateInvoice({
                     Envoyer par Email
                   </button>
 
-                  <button 
+                  <button
                     onClick={() => setShowSendModal(false)}
                     className="w-full mt-2 px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                   >
