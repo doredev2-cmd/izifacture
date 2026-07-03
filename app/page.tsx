@@ -125,7 +125,7 @@ export default function DashboardPage() {
     
     setIsSubmitting(true);
     const { error } = await supabase.auth.resetPasswordForEmail(loginEmail, {
-      redirectTo: window.location.origin,
+      redirectTo: `${window.location.origin}/auth/callback`,
     });
     
     setIsSubmitting(false);
@@ -203,7 +203,8 @@ export default function DashboardPage() {
           email: loginEmail,
           password: loginPassword,
           options: {
-            data: { name: loginName }
+            data: { name: loginName },
+            emailRedirectTo: `${window.location.origin}/auth/callback`
           }
         });
         
