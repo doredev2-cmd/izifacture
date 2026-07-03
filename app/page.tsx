@@ -152,14 +152,20 @@ export default function DashboardPage() {
     setIsSubmitting(true);
     
     try {
+      // Debug: verify env vars are loaded
+      console.log('[IziFacture Auth] Supabase URL configured:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+      console.log('[IziFacture Auth] Supabase URL value starts with:', process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30));
+
       if (isLoginMode) {
         // Sign In
         const { data, error } = await supabase.auth.signInWithPassword({
           email: loginEmail,
           password: loginPassword
         });
-        
+
         if (error) {
+          // Log full error for debugging
+          console.error('[IziFacture Auth] signInWithPassword error:', JSON.stringify(error), error);
           if (error.message.includes('Invalid login credentials')) {
             throw new Error('Email ou mot de passe incorrect.');
           }
@@ -167,7 +173,7 @@ export default function DashboardPage() {
             throw new Error('Veuillez confirmer votre adresse email avant de vous connecter.');
           }
           if (error.message.toLowerCase().includes('fetch') || error.message.toLowerCase().includes('network') || error.message.toLowerCase().includes('failed')) {
-            throw new Error('Erreur de connexion réseau. Vérifiez votre connexion internet et réessayez.');
+            throw new Error(`Impossible de contacter le serveur d'authentification. Vérifiez que le projet Supabase est actif. (${error.message})`);
           }
           throw new Error(error.message);
         }

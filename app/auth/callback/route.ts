@@ -1,6 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import type { CookieOptions } from '@supabase/ssr';
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -9,19 +10,35 @@ export async function GET(request: NextRequest) {
   const type = requestUrl.searchParams.get('type');
   const next = requestUrl.searchParams.get('next') ?? '/';
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const response = NextResponse.redirect(new URL(next, requestUrl.origin));
 
-  // Handle email confirmation with token_hash (newer Supabase flow)
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value;
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          response.cookies.set({ name, value, ...options });
+        },
+        remove(name: string, options: CookieOptions) {
+          response.cookies.set({ name, value: '', ...options });
+        },
+      },
+    }
+  );
+
+  // Handle email confirmation with token_hash (Supabase OTP flow)
   if (token_hash && type) {
     const { error } = await supabase.auth.verifyOtp({
-      type: type as 'signup' | 'recovery' | 'email',
+      type: type as 'signup' | 'recovery' | 'email' | 'invite' | 'magiclink' | 'sms' | 'phone_change' | 'email_change',
       token_hash,
     });
 
     if (!error) {
-      return NextResponse.redirect(new URL(next, requestUrl.origin));
+      return response;
     }
   }
 
@@ -29,10 +46,10 @@ export async function GET(request: NextRequest) {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(new URL(next, requestUrl.origin));
+      return response;
     }
   }
 
-  // If something went wrong, redirect to home anyway
+  // Fallback - redirect to home anyway (session may still be valid client-side)
   return NextResponse.redirect(new URL('/', requestUrl.origin));
 }
