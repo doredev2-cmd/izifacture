@@ -791,21 +791,21 @@ export default function CreateInvoice({
                 <div className="flex justify-end mb-16">
                   <div className="w-[45%] border border-blue-100 bg-blue-50/20 rounded-2xl p-5 shadow-sm flex flex-col gap-3.5">
                     <div className="flex justify-between items-center text-sm font-medium text-slate-600">
-                      <span>Sous-Total HT :</span>
+                      <span className="whitespace-nowrap">Sous-Total HT :</span>
                       <span className="font-bold text-[#0f172a] whitespace-nowrap">{formatFCFA(getSubtotal(), currency)}</span>
                     </div>
                     {getDiscountAmount() > 0 && (
                       <div className="flex justify-between items-center text-sm font-medium text-emerald-600">
-                        <span>Remise :</span>
+                        <span className="whitespace-nowrap">Remise :</span>
                         <span className="font-bold whitespace-nowrap">-{formatFCFA(getDiscountAmount(), currency)}</span>
                       </div>
                     )}
                     <div className="flex justify-between items-center text-sm font-medium text-slate-600 pb-3 border-b border-blue-100">
-                      <span>TVA (18%) :</span>
+                      <span className="whitespace-nowrap">TVA (18%) :</span>
                       <span className="font-bold text-[#0f172a] whitespace-nowrap">{formatFCFA(getTaxAmount(), currency)}</span>
                     </div>
                     <div className="flex justify-between items-center text-lg font-black text-[#1e2a47]">
-                      <span>Total TTC :</span>
+                      <span className="whitespace-nowrap">Total TTC :</span>
                       <span className="whitespace-nowrap">{formatFCFA(getTotalTTC(), currency)}</span>
                     </div>
 
