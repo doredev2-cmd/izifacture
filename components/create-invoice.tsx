@@ -748,7 +748,7 @@ export default function CreateInvoice({
                 </div>
 
                 {/* Client & Payment Info Box */}
-                <div className="w-full border border-blue-100 bg-blue-50/30 rounded-2xl p-6 mb-10 grid grid-cols-2 gap-8 shadow-sm">
+                <div className="w-full border border-blue-100 bg-blue-50/30 rounded-2xl p-4 sm:p-6 mb-10 flex flex-col sm:grid sm:grid-cols-2 gap-6 sm:gap-8 shadow-sm">
                   <div className="flex flex-col gap-2">
                     <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">FACTURÉ À</h3>
                     <div className="font-black text-base text-[#0f172a]">{activeCliObj?.name || 'NOM PRÉNOM'}</div>
@@ -756,7 +756,7 @@ export default function CreateInvoice({
                       {activeCliObj?.email || 'Adresse email du client'}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2 border-l border-blue-100/50 pl-8">
+                  <div className="flex flex-col gap-2 sm:border-l sm:border-blue-100/50 sm:pl-8 pt-4 sm:pt-0 border-t sm:border-t-0 border-blue-100/50">
                     <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">MODE DE PAIEMENT</h3>
                     <div className="font-bold text-sm text-[#0f172a]">{paymentMethod || 'Virement bancaire'}</div>
                     <div className="text-sm text-slate-600 font-medium">Règlement en {currency}</div>
@@ -789,7 +789,7 @@ export default function CreateInvoice({
 
                 {/* Totals Section */}
                 <div className="flex justify-end mb-16">
-                  <div className="w-[45%] border border-blue-100 bg-blue-50/20 rounded-2xl p-5 shadow-sm flex flex-col gap-3.5">
+                  <div className="w-full sm:w-[80%] md:w-[60%] lg:w-[45%] border border-blue-100 bg-blue-50/20 rounded-2xl p-5 shadow-sm flex flex-col gap-3.5">
                     <div className="flex justify-between items-center text-sm font-medium text-slate-600">
                       <span className="whitespace-nowrap">Sous-Total HT :</span>
                       <span className="font-bold text-[#0f172a] whitespace-nowrap">{formatFCFA(getSubtotal(), currency)}</span>
