@@ -736,8 +736,8 @@ export default function CreateInvoice({
                 {/* Header: INVOICE and LOGO */}
                 <div className="flex justify-between items-start mb-10 z-10">
                   <div className="w-1/2 pt-16">
-                    <h1 className="text-5xl font-black text-[#1e2a47] tracking-wider mb-8">INVOICE</h1>
-                    <div className="text-sm font-bold text-[#1e2a47] mb-1">Invoice to:</div>
+                    <h1 className="text-5xl font-black text-[#1e2a47] tracking-wider mb-8">FACTURE</h1>
+                    <div className="text-sm font-bold text-[#1e2a47] mb-1">Facturé à :</div>
                     <div className="font-black text-base text-[#1e2a47] uppercase">{activeCliObj?.name || 'NAME SURNAME'}</div>
                     <div className="text-xs text-slate-500 mt-1 max-w-[200px] leading-relaxed">
                       {activeCliObj?.address || 'Adresse du client non renseignée'}
@@ -760,12 +760,12 @@ export default function CreateInvoice({
 
                     <div className="mt-14 flex flex-col gap-1.5 w-56 text-sm">
                       <div className="flex justify-between font-bold text-[#1e2a47]">
-                        <span>Invoice #</span>
+                        <span>N° Facture</span>
                         <span>{invoiceNumber || '#1234'}</span>
                       </div>
                       <div className="flex justify-between font-bold text-[#1e2a47]">
                         <span>Date</span>
-                        <span>{issueDate ? new Date(issueDate).toLocaleDateString('en-GB') : '10/10/2024'}</span>
+                        <span>{issueDate ? issueDate : '10/10/2024'}</span>
                       </div>
                     </div>
                   </div>
@@ -774,10 +774,10 @@ export default function CreateInvoice({
                 {/* Table */}
                 <div className="w-full mb-8">
                   <div className="flex bg-[#1e2a47] text-white text-[11px] font-bold py-2.5 px-4 uppercase tracking-wider">
-                    <div className="w-[10%] text-center">No.</div>
-                    <div className="w-[45%]">Service Description</div>
-                    <div className="w-[15%] text-center">Price</div>
-                    <div className="w-[10%] text-center">Qty.</div>
+                    <div className="w-[10%] text-center">N°</div>
+                    <div className="w-[45%]">Désignation / Prestation</div>
+                    <div className="w-[15%] text-center">Prix</div>
+                    <div className="w-[10%] text-center">Qté</div>
                     <div className="w-[20%] text-right">Total</div>
                   </div>
                   
@@ -799,22 +799,22 @@ export default function CreateInvoice({
                   {/* Terms & Info */}
                   <div className="w-[50%] text-[10px] text-[#1e2a47]">
                     <div className="mb-5">
-                      <div className="font-bold mb-1 text-xs">Terms and Conditions</div>
+                      <div className="font-bold mb-1 text-xs">Conditions Générales</div>
                       <div className="text-slate-500 leading-relaxed pr-6">
                         Les règlements s'effectuent en {currency}. Tout retard de paiement entraîne des pénalités selon la réglementation en vigueur. Merci de votre confiance.
                       </div>
                     </div>
                     <div className="mb-5">
-                      <div className="font-bold mb-1 text-xs">Questions:</div>
+                      <div className="font-bold mb-1 text-xs">Questions :</div>
                       <div className="flex flex-col gap-1 text-slate-500 font-medium">
-                        <div className="flex"><span className="w-16">Email us:</span> <span>{activeCompObj.email || 'contact@votreentreprise.com'}</span></div>
+                        <div className="flex"><span className="w-16">Email :</span> <span>{activeCompObj.email || 'contact@votreentreprise.com'}</span></div>
                       </div>
                     </div>
                     <div>
-                      <div className="font-bold mb-1 text-xs">Payment Info:</div>
+                      <div className="font-bold mb-1 text-xs">Informations de paiement :</div>
                       <div className="flex flex-col gap-1 text-slate-500 font-medium">
-                        <div className="flex"><span className="w-20">Method:</span> <span>{paymentMethod}</span></div>
-                        <div className="flex"><span className="w-20">Currency:</span> <span>{currency}</span></div>
+                        <div className="flex"><span className="w-20">Méthode :</span> <span>{paymentMethod || 'Virement bancaire'}</span></div>
+                        <div className="flex"><span className="w-20">Devise :</span> <span>{currency}</span></div>
                       </div>
                     </div>
                   </div>
@@ -823,17 +823,17 @@ export default function CreateInvoice({
                   <div className="w-[45%] flex flex-col items-end">
                     <div className="w-full text-sm font-bold text-[#1e2a47] flex flex-col gap-2.5 mb-4 pr-4 pl-4">
                       <div className="flex justify-between">
-                        <span className="text-slate-600">Subtotal</span>
+                        <span className="text-slate-600">Sous-total</span>
                         <span>{formatFCFA(getSubtotal(), currency)}</span>
                       </div>
-                      {addDiscount && (
+                      {getDiscountAmount() > 0 && (
                          <div className="flex justify-between text-emerald-600">
-                           <span>Discount (-{discountPercent}%)</span>
+                           <span>Remise</span>
                            <span>-{formatFCFA(getDiscountAmount(), currency)}</span>
                          </div>
                       )}
                       <div className="flex justify-between">
-                        <span className="text-slate-600">Tax Rate (18%)</span>
+                        <span className="text-slate-600">TVA (18%)</span>
                         <span>{formatFCFA(getTaxAmount(), currency)}</span>
                       </div>
                     </div>
@@ -857,7 +857,7 @@ export default function CreateInvoice({
                         </div>
                       </div>
                       <div className="border-t border-[#1e2a47] pt-1.5 text-[10px] text-[#1e2a47] font-bold uppercase tracking-wider">
-                        Authorised Sign
+                        Signature de l'Émetteur
                       </div>
                     </div>
                   </div>
@@ -865,20 +865,22 @@ export default function CreateInvoice({
               </div>
 
               {/* Dark blue footer block */}
-              <div className="bg-[#1e2a47] h-14 w-full flex items-center justify-center gap-10 text-[10px] text-white font-medium">
+              <div className="bg-[#1e2a47] h-14 w-full flex items-center justify-center gap-8 text-[10px] text-white font-medium">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">f</div>
+                  <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">fb</div>
                   <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                  </div>
+                  <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">yt</div>
                   <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">ig</div>
                   <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
+                </div>
+                <div className="flex items-center gap-2 ml-4">
+                  <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">@</div>
+                  <span>{activeCompObj.email || 'contact@votreentreprise.com'}</span>
                 </div>
               </div>
             </div>

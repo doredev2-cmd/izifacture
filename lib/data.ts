@@ -128,9 +128,8 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
   `).join('');
 
   const subtotal = invoice.subtotal || (invoice.amount - (invoice.taxAmount || 0));
-  const discountHtml = (invoice.discountAmount && invoice.discountAmount > 0) ? `
     <div style="display: flex; justify-content: space-between; color: #059669;">
-      <span>Discount</span>
+      <span>Remise</span>
       <span>-${formatFCFA(invoice.discountAmount, activeCompany.currency)}</span>
     </div>
   ` : '';
@@ -157,6 +156,7 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
       <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap');
+        script { display: none; }
         body {
           font-family: 'Inter', -apple-system, sans-serif;
           margin: 0;
@@ -261,9 +261,9 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
         <div class="content-area">
           <div class="header">
             <div class="header-left">
-              <h1 class="main-title">INVOICE</h1>
-              <div style="font-size: 14px; font-weight: 700; color: #1e2a47; margin-bottom: 4px;">Invoice to:</div>
-              <div style="font-weight: 900; font-size: 16px; color: #1e2a47; text-transform: uppercase;">${invoice.clientName || 'NAME SURNAME'}</div>
+              <h1 class="main-title">FACTURE</h1>
+              <div style="font-size: 14px; font-weight: 700; color: #1e2a47; margin-bottom: 4px;">Facturé à :</div>
+              <div style="font-weight: 900; font-size: 16px; color: #1e2a47; text-transform: uppercase;">${invoice.clientName || 'NOM PRENOM'}</div>
               <div style="font-size: 12px; color: #64748b; margin-top: 4px; max-width: 200px; line-height: 1.6;">
                 ${invoice.clientEmail || 'Adresse du client non renseignée'}
               </div>
@@ -280,7 +280,7 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
 
               <div style="margin-top: 56px; display: flex; flex-direction: column; gap: 6px; width: 224px; font-size: 14px;">
                 <div style="display: flex; justify-content: space-between; font-weight: 700; color: #1e2a47;">
-                  <span>Invoice #</span>
+                  <span>N° Facture</span>
                   <span>${invoice.invoiceNumber || '#1234'}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-weight: 700; color: #1e2a47;">
@@ -293,10 +293,10 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
 
           <div style="width: 100%; margin-bottom: 32px;">
             <div style="display: flex; background-color: #1e2a47; color: white; font-size: 11px; font-weight: 700; padding: 10px 16px; text-transform: uppercase; letter-spacing: 0.05em;">
-              <div style="width: 10%; text-align: center;">No.</div>
-              <div style="width: 45%;">Service Description</div>
-              <div style="width: 15%; text-align: center;">Price</div>
-              <div style="width: 10%; text-align: center;">Qty.</div>
+              <div style="width: 10%; text-align: center;">N°</div>
+              <div style="width: 45%;">Désignation / Prestation</div>
+              <div style="width: 15%; text-align: center;">Prix</div>
+              <div style="width: 10%; text-align: center;">Qté</div>
               <div style="width: 20%; text-align: right;">Total</div>
             </div>
             
@@ -316,22 +316,22 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
           <div style="display: flex; justify-content: space-between; margin-top: auto; margin-bottom: 16px;">
             <div style="width: 50%; font-size: 10px; color: #1e2a47;">
               <div style="margin-bottom: 20px;">
-                <div style="font-weight: 700; margin-bottom: 4px; font-size: 12px;">Terms and Conditions</div>
+                <div style="font-weight: 700; margin-bottom: 4px; font-size: 12px;">Conditions Générales</div>
                 <div style="color: #64748b; line-height: 1.6; padding-right: 24px;">
                   Les règlements s'effectuent en ${activeCompany.currency}. Tout retard de paiement entraîne des pénalités selon la réglementation en vigueur. Merci de votre confiance.
                 </div>
               </div>
               <div style="margin-bottom: 20px;">
-                <div style="font-weight: 700; margin-bottom: 4px; font-size: 12px;">Questions:</div>
+                <div style="font-weight: 700; margin-bottom: 4px; font-size: 12px;">Questions :</div>
                 <div style="display: flex; flex-direction: column; gap: 4px; color: #64748b; font-weight: 500;">
-                  <div style="display: flex;"><span style="width: 64px;">Email us:</span> <span>${activeCompany.email || 'contact@votreentreprise.com'}</span></div>
+                  <div style="display: flex;"><span style="width: 64px;">Email :</span> <span>${activeCompany.email || 'contact@votreentreprise.com'}</span></div>
                 </div>
               </div>
               <div>
-                <div style="font-weight: 700; margin-bottom: 4px; font-size: 12px;">Payment Info:</div>
+                <div style="font-weight: 700; margin-bottom: 4px; font-size: 12px;">Informations de paiement :</div>
                 <div style="display: flex; flex-direction: column; gap: 4px; color: #64748b; font-weight: 500;">
-                  <div style="display: flex;"><span style="width: 80px;">Method:</span> <span>${invoice.paymentMethod || 'Virement bancaire'}</span></div>
-                  <div style="display: flex;"><span style="width: 80px;">Currency:</span> <span>${activeCompany.currency}</span></div>
+                  <div style="display: flex;"><span style="width: 80px;">Méthode :</span> <span>${invoice.paymentMethod || 'Virement bancaire'}</span></div>
+                  <div style="display: flex;"><span style="width: 80px;">Devise :</span> <span>${activeCompany.currency}</span></div>
                 </div>
               </div>
             </div>
@@ -339,12 +339,12 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
             <div style="width: 45%; display: flex; flex-direction: column; align-items: flex-end;">
               <div style="width: 100%; font-size: 14px; font-weight: 700; color: #1e2a47; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; padding: 0 16px;">
                 <div style="display: flex; justify-content: space-between;">
-                  <span style="color: #475569;">Subtotal</span>
+                  <span style="color: #475569;">Sous-total</span>
                   <span>${formatFCFA(subtotal, activeCompany.currency)}</span>
                 </div>
                 ${discountHtml}
                 <div style="display: flex; justify-content: space-between;">
-                  <span style="color: #475569;">Tax Rate (18%)</span>
+                  <span style="color: #475569;">TVA (18%)</span>
                   <span>${formatFCFA(invoice.taxAmount || 0, activeCompany.currency)}</span>
                 </div>
               </div>
@@ -360,35 +360,48 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
                   </div>
                 </div>
                 <div style="border-top: 1px solid #1e2a47; padding-top: 6px; font-size: 10px; color: #1e2a47; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-                  Authorised Sign
+                  Signature de l'Émetteur
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div style="background-color: #1e2a47; height: 56px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 40px; font-size: 10px; color: white; font-weight: 500;">
+        <div style="background-color: #1e2a47; height: 56px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 32px; font-size: 10px; color: white; font-weight: 500;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">f</div>
-            <span>@${activeCompany.name.replace(/\\s+/g, '').toLowerCase() || 'username'}</span>
+            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">fb</div>
+            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">
-              <svg style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            </div>
-            <span>@${activeCompany.name.replace(/\\s+/g, '').toLowerCase() || 'username'}</span>
+            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">yt</div>
+            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
             <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">ig</div>
-            <span>@${activeCompany.name.replace(/\\s+/g, '').toLowerCase() || 'username'}</span>
+            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-left: 16px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">@</div>
+            <span>${activeCompany.email || 'contact@votreentreprise.com'}</span>
           </div>
         </div>
       </div>
 
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
       <script>
         window.onload = function() {
-          window.print();
-          setTimeout(function() { window.close(); }, 500);
+          const element = document.querySelector('.invoice-card');
+          const opt = {
+            margin:       0,
+            filename:     'Facture_${invoice.invoiceNumber}.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+          
+          html2pdf().set(opt).from(element).save().then(() => {
+            setTimeout(function() { window.close(); }, 1000);
+          });
         }
       </script>
     </body>
