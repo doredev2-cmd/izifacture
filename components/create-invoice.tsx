@@ -711,177 +711,133 @@ export default function CreateInvoice({
             </div>
 
             {/* A4 Paper mockup invoice container (New Professional Design) */}
+            {/* A4 Paper mockup invoice container (Classic Clean Design with Blue/Black accents) */}
             <div 
-              className="bg-white rounded-none border border-slate-200 shadow-premium w-full relative overflow-hidden flex flex-col justify-between mx-auto" 
-              style={{ minHeight: '842px', backgroundColor: 'white' }}
+              className="bg-white rounded-none shadow-premium w-full relative overflow-hidden flex flex-col justify-between mx-auto text-slate-800" 
+              style={{ minHeight: '842px', backgroundColor: 'white', padding: '40px 48px' }}
             >
               
-              {/* Top decorative elements */}
-              <div className="absolute top-0 left-0 w-full h-32 overflow-hidden pointer-events-none">
-                {/* Dots on top left */}
-                <div className="absolute top-10 left-10 grid grid-cols-6 gap-2 opacity-50">
-                  {Array.from({length: 42}).map((_, i) => (
-                    <div key={i} className="w-1 h-1 rounded-full bg-yellow-500"></div>
-                  ))}
-                </div>
-                {/* Geometric shape in center-top */}
-                <svg className="absolute top-0 left-[45%] -translate-x-1/2 w-48 h-32 text-yellow-500" viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="1.5">
-                   <path d="M10,0 L50,40 L90,0" />
-                   <path d="M25,0 L50,25 L75,0" />
-                   <path d="M40,0 L50,10 L60,0" />
-                </svg>
-              </div>
-
-              <div className="px-10 pt-16 flex-1 flex flex-col">
-                {/* Header: INVOICE and LOGO */}
-                <div className="flex justify-between items-start mb-10 z-10">
-                  <div className="w-1/2 pt-16">
-                    <h1 className="text-5xl font-black text-[#1e2a47] tracking-wider mb-8">FACTURE</h1>
-                    <div className="text-sm font-bold text-[#1e2a47] mb-1">Facturé à :</div>
-                    <div className="font-black text-base text-[#1e2a47] uppercase">{activeCliObj?.name || 'NOM PRÉNOM'}</div>
-                    <div className="text-xs text-slate-500 mt-1 max-w-[200px] leading-relaxed">
-                      {activeCliObj?.address || 'Adresse du client non renseignée'}
-                    </div>
-                  </div>
-                  
-                  <div className="w-1/2 flex flex-col items-end pt-4">
+              <div className="flex-1 flex flex-col">
+                {/* Top Header Section */}
+                <div className="flex justify-between items-start mb-12">
+                  {/* Left: Company Info */}
+                  <div className="flex flex-col gap-1.5">
                     {/* Logo */}
                     {activeCompObj.logo && activeCompObj.logo.startsWith('data:image') ? (
-                      <img src={activeCompObj.logo} alt="Logo" className="max-h-16 object-contain mb-3" />
+                      <img src={activeCompObj.logo} alt="Logo" className="max-h-16 object-contain mb-4" />
                     ) : (
-                      <div className="flex gap-1.5 mb-5 mr-3">
-                         <div className="w-6 h-6 bg-[#1e2a47] transform rotate-45"></div>
-                         <div className="w-6 h-6 bg-yellow-500 transform rotate-45"></div>
-                         <div className="w-6 h-6 bg-[#1e2a47] transform rotate-45"></div>
+                      <div className="w-12 h-12 mb-4 bg-[#1e2a47] rounded-xl flex items-center justify-center text-yellow-400 font-black text-2xl shadow-md">
+                        {activeCompObj.name.charAt(0)}
                       </div>
                     )}
-                    <div className="text-xl font-black text-[#1e2a47] tracking-widest uppercase text-right">{activeCompObj.name || 'VOTRE LOGO'}</div>
-                    <div className="text-[9px] font-semibold text-slate-500 tracking-[0.2em] uppercase mt-1">SLOGAN / RCCM: {activeCompObj.rccm || '-'}</div>
+                    <h2 className="text-xl font-black text-[#0f172a]">{activeCompObj.name || 'VOTRE LOGO'}</h2>
+                    <p className="text-sm text-slate-600 font-medium">{activeCompObj.address || 'Adresse de l\'entreprise'}</p>
+                    <p className="text-[11px] text-slate-500 font-medium">RCCM : {activeCompObj.rccm || '-'} • NIF : {activeCompObj.nif || '-'}</p>
+                  </div>
 
-                    <div className="mt-14 flex flex-col gap-1.5 w-56 text-sm">
-                      <div className="flex justify-between font-bold text-[#1e2a47]">
-                        <span>N° Facture</span>
-                        <span>{invoiceNumber || '#1234'}</span>
+                  {/* Right: Invoice Info */}
+                  <div className="flex flex-col items-end text-right">
+                    <h1 className="text-4xl font-black text-blue-600 tracking-wider mb-2 uppercase">FACTURE</h1>
+                    <p className="text-lg font-bold text-[#0f172a] mb-6">{invoiceNumber || '#INV-1234'}</p>
+                    <div className="flex flex-col gap-1 text-sm font-medium text-slate-600">
+                      <div className="flex justify-end gap-2">
+                        <span>Date d'émission :</span>
+                        <span className="font-bold text-[#0f172a]">{issueDate || '10/10/2024'}</span>
                       </div>
-                      <div className="flex justify-between font-bold text-[#1e2a47]">
-                        <span>Date</span>
-                        <span>{issueDate ? issueDate : '10/10/2024'}</span>
+                      <div className="flex justify-end gap-2">
+                        <span>Date d'échéance :</span>
+                        <span className="font-bold text-rose-600">{dueDate || '25/10/2024'}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Table */}
-                <div className="w-full mb-8">
-                  <div className="flex bg-[#1e2a47] text-white text-[11px] font-bold py-2.5 px-4 uppercase tracking-wider">
-                    <div className="w-[10%] text-center">N°</div>
-                    <div className="w-[45%]">Désignation / Prestation</div>
-                    <div className="w-[15%] text-center">Prix</div>
-                    <div className="w-[10%] text-center">Qté</div>
-                    <div className="w-[20%] text-right">Total</div>
+                {/* Client & Payment Info Box */}
+                <div className="w-full border border-blue-100 bg-blue-50/30 rounded-2xl p-6 mb-10 grid grid-cols-2 gap-8 shadow-sm">
+                  <div className="flex flex-col gap-2">
+                    <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">FACTURÉ À</h3>
+                    <div className="font-black text-base text-[#0f172a]">{activeCliObj?.name || 'NOM PRÉNOM'}</div>
+                    <div className="text-sm text-slate-600 font-medium">
+                      {activeCliObj?.email || 'Adresse email du client'}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 border-l border-blue-100/50 pl-8">
+                    <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">MODE DE PAIEMENT</h3>
+                    <div className="font-bold text-sm text-[#0f172a]">{paymentMethod || 'Virement bancaire'}</div>
+                    <div className="text-sm text-slate-600 font-medium">Règlement en {currency}</div>
+                  </div>
+                </div>
+
+                {/* Items Table */}
+                <div className="w-full mb-10 flex-1">
+                  {/* Table Header */}
+                  <div className="flex text-[10px] font-bold text-slate-500 uppercase tracking-wider pb-3 border-b-2 border-[#1e2a47]">
+                    <div className="w-[60%]">DÉSIGNATION / PRESTATION</div>
+                    <div className="w-[15%] text-center">QUANTITÉ</div>
+                    <div className="w-[25%] text-right">TOTAL HT</div>
                   </div>
                   
-                  <div className="border-b-2 border-[#1e2a47] mb-6">
+                  {/* Table Body */}
+                  <div className="flex flex-col border-b border-slate-200 mb-6">
                     {items.map((item, index) => (
-                      <div key={item.id} className="flex text-xs py-4 px-4 border-b border-slate-200 text-[#1e2a47] font-semibold items-center">
-                        <div className="w-[10%] text-center text-slate-500">{index + 1}</div>
-                        <div className="w-[45%] font-bold">{item.description || 'Description de la prestation'}</div>
-                        <div className="w-[15%] text-center text-slate-600">{formatFCFA(item.unitPrice, currency)}</div>
-                        <div className="w-[10%] text-center text-slate-600">{item.quantity}</div>
-                        <div className="w-[20%] text-right">{formatFCFA(item.quantity * item.unitPrice, currency)}</div>
+                      <div key={item.id} className="flex py-5 border-b border-slate-100 last:border-0 items-start">
+                        <div className="w-[60%] flex flex-col gap-1.5 pr-4">
+                          <span className="font-bold text-sm text-[#0f172a] leading-snug">{item.description || 'Description de la prestation'}</span>
+                          <span className="text-xs text-slate-500 font-medium">P.U. : {formatFCFA(item.unitPrice, currency)}</span>
+                        </div>
+                        <div className="w-[15%] text-center font-bold text-sm text-[#0f172a] pt-1">{item.quantity}</div>
+                        <div className="w-[25%] text-right font-bold text-sm text-[#0f172a] pt-1">{formatFCFA(item.quantity * item.unitPrice, currency)}</div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Footer section (Totals and Terms) */}
-                <div className="flex justify-between mt-auto mb-4">
-                  {/* Terms & Info */}
-                  <div className="w-[50%] text-[10px] text-[#1e2a47]">
-                    <div className="mb-5">
-                      <div className="font-bold mb-1 text-xs">Conditions Générales</div>
-                      <div className="text-slate-500 leading-relaxed pr-6">
-                        Les règlements s'effectuent en {currency}. Tout retard de paiement entraîne des pénalités selon la réglementation en vigueur. Merci de votre confiance.
-                      </div>
+                {/* Totals Section */}
+                <div className="flex justify-end mb-16">
+                  <div className="w-[45%] border border-blue-100 bg-blue-50/20 rounded-2xl p-5 shadow-sm flex flex-col gap-3.5">
+                    <div className="flex justify-between items-center text-sm font-medium text-slate-600">
+                      <span>Sous-Total HT :</span>
+                      <span className="font-bold text-[#0f172a]">{formatFCFA(getSubtotal(), currency)}</span>
                     </div>
-                    <div className="mb-5">
-                      <div className="font-bold mb-1 text-xs">Questions :</div>
-                      <div className="flex flex-col gap-1 text-slate-500 font-medium">
-                        <div className="flex"><span className="w-16">Email :</span> <span>{activeCompObj.email || 'contact@votreentreprise.com'}</span></div>
+                    {getDiscountAmount() > 0 && (
+                      <div className="flex justify-between items-center text-sm font-medium text-emerald-600">
+                        <span>Remise :</span>
+                        <span className="font-bold">-{formatFCFA(getDiscountAmount(), currency)}</span>
                       </div>
+                    )}
+                    <div className="flex justify-between items-center text-sm font-medium text-slate-600 pb-3 border-b border-blue-100">
+                      <span>TVA (18%) :</span>
+                      <span className="font-bold text-[#0f172a]">{formatFCFA(getTaxAmount(), currency)}</span>
                     </div>
-                    <div>
-                      <div className="font-bold mb-1 text-xs">Informations de paiement :</div>
-                      <div className="flex flex-col gap-1 text-slate-500 font-medium">
-                        <div className="flex"><span className="w-20">Méthode :</span> <span>{paymentMethod || 'Virement bancaire'}</span></div>
-                        <div className="flex"><span className="w-20">Devise :</span> <span>{currency}</span></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Totals & Signature */}
-                  <div className="w-[45%] flex flex-col items-end">
-                    <div className="w-full text-sm font-bold text-[#1e2a47] flex flex-col gap-2.5 mb-4 pr-4 pl-4">
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Sous-total</span>
-                        <span>{formatFCFA(getSubtotal(), currency)}</span>
-                      </div>
-                      {getDiscountAmount() > 0 && (
-                         <div className="flex justify-between text-emerald-600">
-                           <span>Remise</span>
-                           <span>-{formatFCFA(getDiscountAmount(), currency)}</span>
-                         </div>
-                      )}
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">TVA (18%)</span>
-                        <span>{formatFCFA(getTaxAmount(), currency)}</span>
-                      </div>
-                    </div>
-                    <div className="w-full flex justify-between items-center bg-[#1e2a47] text-white text-sm font-bold py-3 px-4 mb-10">
-                      <span>TOTAL</span>
+                    <div className="flex justify-between items-center text-lg font-black text-[#1e2a47]">
+                      <span>Total TTC :</span>
                       <span>{formatFCFA(getTotalTTC(), currency)}</span>
                     </div>
-
+                    
                     {/* Dynamic Split / Recurring info inside preview */}
                     {invoiceType === 'split' && (
-                      <div className="w-full mb-6 pr-4 pl-4 text-xs font-bold text-blue-600 text-right">
+                      <div className="mt-2 text-[11px] font-bold text-blue-600 text-right">
                         Paiement en {splitPaymentsCount} échéances de {formatFCFA(Math.round(getTotalTTC() / splitPaymentsCount), currency)}
                       </div>
                     )}
-
-                    {/* Signature */}
-                    <div className="w-48 text-center mt-auto pb-4">
-                      <div className="h-20 flex items-end justify-center">
-                        <div className="font-signature text-2xl text-[#1e2a47] opacity-80 -rotate-3">
-                          {activeCompObj.name}
-                        </div>
-                      </div>
-                      <div className="border-t border-[#1e2a47] pt-1.5 text-[10px] text-[#1e2a47] font-bold uppercase tracking-wider">
-                        Signature de l'Émetteur
-                      </div>
-                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Dark blue footer block */}
-              <div className="bg-[#1e2a47] h-14 w-full flex items-center justify-center gap-8 text-[10px] text-white font-medium">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">fb</div>
-                  <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
+                {/* Footer / Signatures */}
+                <div className="mt-auto flex justify-between items-end border-t border-slate-200 pt-6">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-bold text-[#0f172a] uppercase tracking-wide">{activeCompObj.name}</span>
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                      <Check size={14} strokeWidth={3} /> Document signé électroniquement
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col items-end gap-4">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">SIGNATURE DE L'ÉMETTEUR</span>
+                    <span className="font-signature text-2xl text-[#1e2a47] opacity-90">{activeCompObj.name}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">yt</div>
-                  <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">ig</div>
-                  <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
-                </div>
-                <div className="flex items-center gap-2 ml-4">
-                  <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">@</div>
-                  <span>{activeCompObj.email || 'contact@votreentreprise.com'}</span>
-                </div>
+
               </div>
             </div>
           </div>

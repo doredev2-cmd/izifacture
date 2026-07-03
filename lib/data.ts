@@ -247,142 +247,115 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
     </head>
     <body>
       <div class="invoice-card">
-        <div class="decorative-top">
-          <div class="dots-grid">
-            ${dotsHtml}
-          </div>
-          <svg class="geo-shape" viewBox="0 0 100 60" fill="none" stroke="currentColor" stroke-width="1.5">
-             <path d="M10,0 L50,40 L90,0" />
-             <path d="M25,0 L50,25 L75,0" />
-             <path d="M40,0 L50,10 L60,0" />
-          </svg>
-        </div>
-
-        <div class="content-area">
-          <div class="header">
-            <div class="header-left">
-              <h1 class="main-title">FACTURE</h1>
-              <div style="font-size: 14px; font-weight: 700; color: #1e2a47; margin-bottom: 4px;">Facturé à :</div>
-              <div style="font-weight: 900; font-size: 16px; color: #1e2a47; text-transform: uppercase;">${invoice.clientName || 'NOM PRENOM'}</div>
-              <div style="font-size: 12px; color: #64748b; margin-top: 4px; max-width: 200px; line-height: 1.6;">
-                ${invoice.clientEmail || 'Adresse du client non renseignée'}
-              </div>
-            </div>
-            
-            <div class="header-right">
-              ${logoHtml}
-              <div style="font-size: 20px; font-weight: 900; color: #1e2a47; letter-spacing: 0.1em; text-transform: uppercase; text-align: right;">
-                ${activeCompany.name || 'VOTRE LOGO'}
-              </div>
-              <div style="font-size: 9px; font-weight: 600; color: #64748b; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 4px;">
-                SLOGAN / RCCM: ${activeCompany.rccm || '-'}
-              </div>
-
-              <div style="margin-top: 56px; display: flex; flex-direction: column; gap: 6px; width: 224px; font-size: 14px;">
-                <div style="display: flex; justify-content: space-between; font-weight: 700; color: #1e2a47;">
-                  <span>N° Facture</span>
-                  <span>${invoice.invoiceNumber || '#1234'}</span>
+        <div style="padding: 40px 48px; flex: 1; display: flex; flex-direction: column;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 48px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              ${logoHtml ? logoHtml : `
+                <div style="width: 48px; height: 48px; margin-bottom: 16px; background-color: #1e2a47; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #facc15; font-weight: 900; font-size: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                  ${activeCompany.name.charAt(0)}
                 </div>
-                <div style="display: flex; justify-content: space-between; font-weight: 700; color: #1e2a47;">
-                  <span>Date</span>
-                  <span>${invoice.issueDate ? invoice.issueDate : '10/10/2024'}</span>
+              `}
+              <h2 style="font-size: 20px; font-weight: 900; color: #0f172a; margin: 0;">${activeCompany.name || 'VOTRE LOGO'}</h2>
+              <p style="font-size: 14px; color: #475569; font-weight: 500; margin: 0;">${activeCompany.address || 'Adresse de l\'entreprise'}</p>
+              <p style="font-size: 11px; color: #64748b; font-weight: 500; margin: 0;">RCCM : ${activeCompany.rccm || '-'} • NIF : ${activeCompany.nif || '-'}</p>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: flex-end; text-align: right;">
+              <h1 style="font-size: 36px; font-weight: 900; color: #2563eb; letter-spacing: 0.05em; margin: 0 0 8px 0; text-transform: uppercase;">FACTURE</h1>
+              <p style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 24px 0;">${invoice.invoiceNumber || '#INV-1234'}</p>
+              <div style="display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; color: #475569;">
+                <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                  <span>Date d'émission :</span>
+                  <span style="font-weight: 700; color: #0f172a;">${invoice.issueDate ? invoice.issueDate : '10/10/2024'}</span>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                  <span>Date d'échéance :</span>
+                  <span style="font-weight: 700; color: #e11d48;">${invoice.dueDate || '25/10/2024'}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div style="width: 100%; margin-bottom: 32px;">
-            <div style="display: flex; background-color: #1e2a47; color: white; font-size: 11px; font-weight: 700; padding: 10px 16px; text-transform: uppercase; letter-spacing: 0.05em;">
-              <div style="width: 10%; text-align: center;">N°</div>
-              <div style="width: 45%;">Désignation / Prestation</div>
-              <div style="width: 15%; text-align: center;">Prix</div>
-              <div style="width: 10%; text-align: center;">Qté</div>
-              <div style="width: 20%; text-align: right;">Total</div>
+          <div style="width: 100%; border: 1px solid #dbeafe; background-color: rgba(239, 246, 255, 0.5); border-radius: 16px; padding: 24px; margin-bottom: 40px; display: flex; gap: 32px; box-sizing: border-box;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+              <h3 style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">FACTURÉ À</h3>
+              <div style="font-weight: 900; font-size: 16px; color: #0f172a; margin: 0;">${invoice.clientName || 'NOM PRENOM'}</div>
+              <div style="font-size: 14px; color: #475569; font-weight: 500; margin: 0;">${invoice.clientEmail || 'Adresse email du client'}</div>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px; border-left: 1px solid rgba(219, 234, 254, 0.5); padding-left: 32px;">
+              <h3 style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">MODE DE PAIEMENT</h3>
+              <div style="font-weight: 700; font-size: 14px; color: #0f172a; margin: 0;">${invoice.paymentMethod || 'Virement bancaire'}</div>
+              <div style="font-size: 14px; color: #475569; font-weight: 500; margin: 0;">Règlement en ${activeCompany.currency}</div>
+            </div>
+          </div>
+
+          <div style="width: 100%; margin-bottom: 40px; flex: 1;">
+            <div style="display: flex; font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 12px; border-bottom: 2px solid #1e2a47;">
+              <div style="width: 60%;">DÉSIGNATION / PRESTATION</div>
+              <div style="width: 15%; text-align: center;">QUANTITÉ</div>
+              <div style="width: 25%; text-align: right;">TOTAL HT</div>
             </div>
             
-            <div style="border-bottom: 2px solid #1e2a47; margin-bottom: 24px;">
-              ${invoice.items && invoice.items.length > 0 ? itemsHtml : `
-                <div style="display: flex; font-size: 12px; padding: 16px; border-bottom: 1px solid #e2e8f0; color: #1e2a47; font-weight: 600; align-items: center;">
-                  <div style="width: 10%; text-align: center; color: #64748b;">1</div>
-                  <div style="width: 45%; font-weight: 700;">Prestation générale</div>
-                  <div style="width: 15%; text-align: center; color: #475569;">-</div>
-                  <div style="width: 10%; text-align: center; color: #475569;">1</div>
-                  <div style="width: 20%; text-align: right;">${formatFCFA(invoice.subtotal || invoice.amount, activeCompany.currency)}</div>
+            <div style="display: flex; flex-direction: column; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px;">
+              ${invoice.items && invoice.items.length > 0 ? invoice.items.map(item => `
+                <div style="display: flex; padding: 20px 0; border-bottom: 1px solid #f1f5f9; align-items: flex-start;">
+                  <div style="width: 60%; display: flex; flex-direction: column; gap: 6px; padding-right: 16px; box-sizing: border-box;">
+                    <span style="font-weight: 700; font-size: 14px; color: #0f172a; line-height: 1.4;">${item.description || 'Description de la prestation'}</span>
+                    <span style="font-size: 12px; color: #64748b; font-weight: 500;">P.U. : ${formatFCFA(item.unitPrice, activeCompany.currency)}</span>
+                  </div>
+                  <div style="width: 15%; text-align: center; font-weight: 700; font-size: 14px; color: #0f172a; padding-top: 4px;">${item.quantity}</div>
+                  <div style="width: 25%; text-align: right; font-weight: 700; font-size: 14px; color: #0f172a; padding-top: 4px;">${formatFCFA(item.quantity * item.unitPrice, activeCompany.currency)}</div>
+                </div>
+              `).join('') : `
+                <div style="display: flex; padding: 20px 0; border-bottom: 1px solid #f1f5f9; align-items: flex-start;">
+                  <div style="width: 60%; display: flex; flex-direction: column; gap: 6px; padding-right: 16px; box-sizing: border-box;">
+                    <span style="font-weight: 700; font-size: 14px; color: #0f172a; line-height: 1.4;">Prestation générale</span>
+                    <span style="font-size: 12px; color: #64748b; font-weight: 500;">P.U. : ${formatFCFA(invoice.subtotal || invoice.amount, activeCompany.currency)}</span>
+                  </div>
+                  <div style="width: 15%; text-align: center; font-weight: 700; font-size: 14px; color: #0f172a; padding-top: 4px;">1</div>
+                  <div style="width: 25%; text-align: right; font-weight: 700; font-size: 14px; color: #0f172a; padding-top: 4px;">${formatFCFA(invoice.subtotal || invoice.amount, activeCompany.currency)}</div>
                 </div>
               `}
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; margin-top: auto; margin-bottom: 16px;">
-            <div style="width: 50%; font-size: 10px; color: #1e2a47;">
-              <div style="margin-bottom: 20px;">
-                <div style="font-weight: 700; margin-bottom: 4px; font-size: 12px;">Conditions Générales</div>
-                <div style="color: #64748b; line-height: 1.6; padding-right: 24px;">
-                  Les règlements s'effectuent en ${activeCompany.currency}. Tout retard de paiement entraîne des pénalités selon la réglementation en vigueur. Merci de votre confiance.
-                </div>
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 64px;">
+            <div style="width: 45%; border: 1px solid #dbeafe; background-color: rgba(239, 246, 255, 0.4); border-radius: 16px; padding: 20px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; gap: 14px; box-sizing: border-box;">
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; color: #475569;">
+                <span>Sous-Total HT :</span>
+                <span style="font-weight: 700; color: #0f172a;">${formatFCFA(subtotal, activeCompany.currency)}</span>
               </div>
-              <div style="margin-bottom: 20px;">
-                <div style="font-weight: 700; margin-bottom: 4px; font-size: 12px;">Questions :</div>
-                <div style="display: flex; flex-direction: column; gap: 4px; color: #64748b; font-weight: 500;">
-                  <div style="display: flex;"><span style="width: 64px;">Email :</span> <span>${activeCompany.email || 'contact@votreentreprise.com'}</span></div>
+              ${invoice.discountAmount && invoice.discountAmount > 0 ? `
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; color: #059669;">
+                  <span>Remise :</span>
+                  <span style="font-weight: 700;">-${formatFCFA(invoice.discountAmount, activeCompany.currency)}</span>
                 </div>
+              ` : ''}
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; color: #475569; padding-bottom: 12px; border-bottom: 1px solid #dbeafe;">
+                <span>TVA (18%) :</span>
+                <span style="font-weight: 700; color: #0f172a;">${formatFCFA(invoice.taxAmount || 0, activeCompany.currency)}</span>
               </div>
-              <div>
-                <div style="font-weight: 700; margin-bottom: 4px; font-size: 12px;">Informations de paiement :</div>
-                <div style="display: flex; flex-direction: column; gap: 4px; color: #64748b; font-weight: 500;">
-                  <div style="display: flex;"><span style="width: 80px;">Méthode :</span> <span>${invoice.paymentMethod || 'Virement bancaire'}</span></div>
-                  <div style="display: flex;"><span style="width: 80px;">Devise :</span> <span>${activeCompany.currency}</span></div>
-                </div>
-              </div>
-            </div>
-
-            <div style="width: 45%; display: flex; flex-direction: column; align-items: flex-end;">
-              <div style="width: 100%; font-size: 14px; font-weight: 700; color: #1e2a47; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; padding: 0 16px;">
-                <div style="display: flex; justify-content: space-between;">
-                  <span style="color: #475569;">Sous-total</span>
-                  <span>${formatFCFA(subtotal, activeCompany.currency)}</span>
-                </div>
-                ${discountHtml}
-                <div style="display: flex; justify-content: space-between;">
-                  <span style="color: #475569;">TVA (18%)</span>
-                  <span>${formatFCFA(invoice.taxAmount || 0, activeCompany.currency)}</span>
-                </div>
-              </div>
-              <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; background-color: #1e2a47; color: white; font-size: 14px; font-weight: 700; padding: 12px 16px; margin-bottom: 40px; box-sizing: border-box;">
-                <span>TOTAL</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 900; color: #1e2a47;">
+                <span>Total TTC :</span>
                 <span>${formatFCFA(invoice.amount, activeCompany.currency)}</span>
               </div>
-
-              <div style="width: 192px; text-align: center; margin-top: auto; padding-bottom: 16px;">
-                <div style="height: 80px; display: flex; align-items: flex-end; justify-content: center;">
-                  <div class="signature-font" style="font-size: 32px; color: #1e2a47; opacity: 0.8; transform: rotate(-3deg);">
-                    ${activeCompany.name}
-                  </div>
-                </div>
-                <div style="border-top: 1px solid #1e2a47; padding-top: 6px; font-size: 10px; color: #1e2a47; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-                  Signature de l'Émetteur
-                </div>
-              </div>
             </div>
           </div>
-        </div>
 
-        <div style="background-color: #1e2a47; height: 56px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 32px; font-size: 10px; color: white; font-weight: 500;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">fb</div>
-            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">yt</div>
-            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">ig</div>
-            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 8px; margin-left: 16px;">
-            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">@</div>
-            <span>${activeCompany.email || 'contact@votreentreprise.com'}</span>
+          <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #e2e8f0; padding-top: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <span style="font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.025em;">${activeCompany.name}</span>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: #059669;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Document signé électroniquement
+              </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 16px;">
+              <span style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">SIGNATURE DE L'ÉMETTEUR</span>
+              <span class="signature-font" style="font-size: 32px; color: #1e2a47; opacity: 0.9;">${activeCompany.name}</span>
+            </div>
           </div>
         </div>
       </div>
