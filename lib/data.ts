@@ -272,7 +272,7 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
             <div class="header-right">
               ${logoHtml}
               <div style="font-size: 20px; font-weight: 900; color: #1e2a47; letter-spacing: 0.1em; text-transform: uppercase; text-align: right;">
-                ${activeCompany.name || 'YOUR LOGO'}
+                ${activeCompany.name || 'VOTRE LOGO'}
               </div>
               <div style="font-size: 9px; font-weight: 600; color: #64748b; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 4px;">
                 SLOGAN / RCCM: ${activeCompany.rccm || '-'}
@@ -370,15 +370,15 @@ export function printInvoice(invoice: Invoice, activeCompany: Company) {
         <div style="background-color: #1e2a47; height: 56px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 32px; font-size: 10px; color: white; font-weight: 500;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">fb</div>
-            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
+            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
             <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">yt</div>
-            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
+            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
             <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">ig</div>
-            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
+            <span>@${activeCompany.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
           </div>
           <div style="display: flex; align-items: center; gap: 8px; margin-left: 16px;">
             <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #eab308; display: flex; align-items: center; justify-content: center; color: #1e2a47; font-weight: 700; font-size: 12px;">@</div>

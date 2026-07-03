@@ -738,7 +738,7 @@ export default function CreateInvoice({
                   <div className="w-1/2 pt-16">
                     <h1 className="text-5xl font-black text-[#1e2a47] tracking-wider mb-8">FACTURE</h1>
                     <div className="text-sm font-bold text-[#1e2a47] mb-1">Facturé à :</div>
-                    <div className="font-black text-base text-[#1e2a47] uppercase">{activeCliObj?.name || 'NAME SURNAME'}</div>
+                    <div className="font-black text-base text-[#1e2a47] uppercase">{activeCliObj?.name || 'NOM PRÉNOM'}</div>
                     <div className="text-xs text-slate-500 mt-1 max-w-[200px] leading-relaxed">
                       {activeCliObj?.address || 'Adresse du client non renseignée'}
                     </div>
@@ -755,7 +755,7 @@ export default function CreateInvoice({
                          <div className="w-6 h-6 bg-[#1e2a47] transform rotate-45"></div>
                       </div>
                     )}
-                    <div className="text-xl font-black text-[#1e2a47] tracking-widest uppercase text-right">{activeCompObj.name || 'YOUR LOGO'}</div>
+                    <div className="text-xl font-black text-[#1e2a47] tracking-widest uppercase text-right">{activeCompObj.name || 'VOTRE LOGO'}</div>
                     <div className="text-[9px] font-semibold text-slate-500 tracking-[0.2em] uppercase mt-1">SLOGAN / RCCM: {activeCompObj.rccm || '-'}</div>
 
                     <div className="mt-14 flex flex-col gap-1.5 w-56 text-sm">
@@ -868,15 +868,15 @@ export default function CreateInvoice({
               <div className="bg-[#1e2a47] h-14 w-full flex items-center justify-center gap-8 text-[10px] text-white font-medium">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">fb</div>
-                  <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
+                  <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">yt</div>
-                  <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
+                  <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">ig</div>
-                  <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'username'}</span>
+                  <span>@{activeCompObj.name.replace(/\s+/g, '').toLowerCase() || 'utilisateur'}</span>
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[#1e2a47] font-bold text-xs">@</div>
