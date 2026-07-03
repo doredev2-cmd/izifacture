@@ -115,7 +115,7 @@ export const mockRevenueData: RevenueData[] = [
 export function formatFCFA(amount: number, currency: string = 'GNF'): string {
   // Rounded to integer as requested
   const rounded = Math.round(amount);
-  return rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ' + currency;
+  return rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0') + '\u00A0' + currency;
 }
 
 export function printInvoice(invoice: Invoice, activeCompany: Company, clients?: Client[]) {
@@ -482,24 +482,24 @@ export function printInvoice(invoice: Invoice, activeCompany: Company, clients?:
             <div class="summary-box">
               <div class="summary-row">
                 <span style="font-weight: 500;">${t.summary.subtotal}</span>
-                <span style="font-weight: 700; color: #0f172a;">${formatFCFA(subtotal, activeCompany.currency)}</span>
+                <span style="font-weight: 700; color: #0f172a; white-space: nowrap;">${formatFCFA(subtotal, activeCompany.currency)}</span>
               </div>
               
-              ${invoice.discountAmount && invoice.discountAmount > 0 ? `
+              ${(invoice.discountAmount || 0) > 0 ? `
               <div class="summary-row" style="color: #059669;">
                 <span style="font-weight: 500;">${t.summary.discount}</span>
-                <span style="font-weight: 700;">-${formatFCFA(invoice.discountAmount, activeCompany.currency)}</span>
+                <span style="font-weight: 700; white-space: nowrap;">-${formatFCFA(invoice.discountAmount || 0, activeCompany.currency)}</span>
               </div>
               ` : ''}
 
               <div class="summary-row">
                 <span style="font-weight: 500;">${t.summary.taxRate}</span>
-                <span style="font-weight: 700; color: #0f172a;">${formatFCFA(invoice.taxAmount || 0, activeCompany.currency)}</span>
+                <span style="font-weight: 700; color: #0f172a; white-space: nowrap;">${formatFCFA(invoice.taxAmount || 0, activeCompany.currency)}</span>
               </div>
 
               <div class="summary-total">
                 <span>${t.summary.totalTTC}</span>
-                <span style="color: #2563eb;">${formatFCFA(invoice.amount, activeCompany.currency)}</span>
+                <span style="color: #2563eb; white-space: nowrap;">${formatFCFA(invoice.amount, activeCompany.currency)}</span>
               </div>
             </div>
           </div>
