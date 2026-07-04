@@ -18,6 +18,7 @@ import ReportsPage from '../components/reports-page';
 import SettingsPage from '../components/settings-page';
 import HelpPage from '../components/help-page';
 import AdminDashboard from '../components/admin-dashboard';
+import LandingPage from '../components/landing-page';
 
 import { 
   Company, 
@@ -60,6 +61,7 @@ export default function DashboardPage() {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [isResetMode, setIsResetMode] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [showLanding, setShowLanding] = useState(true);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -820,6 +822,10 @@ export default function DashboardPage() {
   }
 
   if (user === null) {
+    if (showLanding) {
+      return <LandingPage onStart={() => setShowLanding(false)} />;
+    }
+
     return (
       <div className="relative min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 px-4 py-12 transition-colors duration-200 overflow-hidden">
         {/* Background Decorative Blobs */}
