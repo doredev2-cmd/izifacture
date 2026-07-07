@@ -43,24 +43,37 @@ export default function SubscriptionModal({ isOpen, onClose, userId, userEmail, 
   };
 
   const simulatePayment = async () => {
-    // Validation du numéro de téléphone
+    // Validation
     const cleanedNumber = phoneNumber.replace(/\s+/g, '');
-    if (!/^\d{9}$/.test(cleanedNumber)) {
-      showToast("Le numéro doit contenir exactement 9 chiffres.", "error");
-      return;
-    }
+    
+    if (paymentMethod !== 'Carte Bancaire (Afrique)') {
+      if (!/^\d{9}$/.test(cleanedNumber)) {
+        showToast("Le numéro doit contenir exactement 9 chiffres.", "error");
+        return;
+      }
 
-    if (paymentMethod === 'Orange Money' && !/^(62|61)/.test(cleanedNumber)) {
-      showToast("Un numéro Orange Money doit commencer par 62 ou 61.", "error");
-      return;
-    }
+      if (paymentMethod === 'Orange Money' && !/^(62|61)/.test(cleanedNumber)) {
+        showToast("Un numéro Orange Money doit commencer par 62 ou 61.", "error");
+        return;
+      }
 
-    if (paymentMethod === 'MTN Mobile Money' && !/^66/.test(cleanedNumber)) {
-      showToast("Un numéro MTN Mobile Money doit commencer par 66.", "error");
-      return;
+      if (paymentMethod === 'MTN Mobile Money' && !/^66/.test(cleanedNumber)) {
+        showToast("Un numéro MTN Mobile Money doit commencer par 66.", "error");
+        return;
+      }
+    } else {
+      if (cleanedNumber.length < 8) {
+        showToast("Veuillez entrer un identifiant de paiement valide.", "error");
+        return;
+      }
     }
     
     setIsProcessing(true);
+    if (paymentMethod !== 'Carte Bancaire (Afrique)') {
+      showToast("Veuillez valider le paiement sur votre téléphone (Pop-up USSD).", "info");
+    } else {
+      showToast("Connexion à la passerelle de paiement...", "info");
+    }
     
     // Simuler le délai d'une vraie API (USSD Push, puis Webhook)
     setTimeout(async () => {
@@ -300,7 +313,7 @@ export default function SubscriptionModal({ isOpen, onClose, userId, userEmail, 
                   className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isProcessing ? (
-                    <><Loader2 className="animate-spin" size={18} /> Traitement en cours...</>
+                    <><Loader2 className="animate-spin" size={18} /> En attente de validation...</>
                   ) : (
                     <>Payer {formatFCFA(getPrice(selectedPlan, billingCycle))} maintenant</>
                   )}
