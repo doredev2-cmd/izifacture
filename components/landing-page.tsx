@@ -7,7 +7,7 @@ import Features from './landing/features';
 import Pricing from './landing/pricing';
 import Footer from './landing/footer';
 
-export default function LandingPage({ onStart }: { onStart: () => void }) {
+export default function LandingPage({ onStart }: { onStart: (plan?: 'Pro' | 'Business') => void }) {
   // Ensure we start at the top of the page when mounting
   useEffect(() => {
     window.scrollTo(0, 0);

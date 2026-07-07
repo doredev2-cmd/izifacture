@@ -10,19 +10,27 @@ interface SubscriptionModalProps {
   onClose: () => void;
   userId: string;
   userEmail: string;
+  initialPlan?: 'Pro' | 'Business';
   onSuccess?: () => void;
   showToast: (msg: string, type: 'success'|'error'|'info') => void;
 }
 
-export default function SubscriptionModal({ isOpen, onClose, userId, userEmail, onSuccess, showToast }: SubscriptionModalProps) {
+export default function SubscriptionModal({ isOpen, onClose, userId, userEmail, initialPlan, onSuccess, showToast }: SubscriptionModalProps) {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'quarterly' | 'annual'>('monthly');
-  const [selectedPlan, setSelectedPlan] = useState<'Pro' | 'Business'>('Pro');
+  const [selectedPlan, setSelectedPlan] = useState<'Pro' | 'Business'>(initialPlan || 'Pro');
   const [step, setStep] = useState<1 | 2>(1); // 1: Choose plan, 2: Checkout
   
   // Checkout states
-  const [paymentMethod, setPaymentMethod] = useState<'Orange Money' | 'MTN Mobile Money'>('Orange Money');
+  const [paymentMethod, setPaymentMethod] = useState<'Orange Money' | 'MTN Mobile Money' | 'Carte Bancaire (Afrique)'>('Orange Money');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Sync initialPlan when it changes
+  React.useEffect(() => {
+    if (initialPlan) {
+      setSelectedPlan(initialPlan);
+    }
+  }, [initialPlan]);
 
   if (!isOpen) return null;
 
@@ -35,8 +43,20 @@ export default function SubscriptionModal({ isOpen, onClose, userId, userEmail, 
   };
 
   const simulatePayment = async () => {
-    if (!phoneNumber || phoneNumber.length < 8) {
-      showToast("Veuillez entrer un numéro de téléphone valide.", "error");
+    // Validation du numéro de téléphone
+    const cleanedNumber = phoneNumber.replace(/\s+/g, '');
+    if (!/^\d{9}$/.test(cleanedNumber)) {
+      showToast("Le numéro doit contenir exactement 9 chiffres.", "error");
+      return;
+    }
+
+    if (paymentMethod === 'Orange Money' && !/^(62|61)/.test(cleanedNumber)) {
+      showToast("Un numéro Orange Money doit commencer par 62 ou 61.", "error");
+      return;
+    }
+
+    if (paymentMethod === 'MTN Mobile Money' && !/^66/.test(cleanedNumber)) {
+      showToast("Un numéro MTN Mobile Money doit commencer par 66.", "error");
       return;
     }
     
@@ -208,40 +228,55 @@ export default function SubscriptionModal({ isOpen, onClose, userId, userEmail, 
                   <Smartphone className="text-slate-400" /> Moyen de paiement
                 </h3>
                 
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
                   {/* Orange Money */}
                   <div 
                     onClick={() => setPaymentMethod('Orange Money')}
-                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    className={`flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all ${
                       paymentMethod === 'Orange Money' ? 'border-[#ff7900] bg-orange-50/50 dark:bg-orange-950/20' : 'border-slate-100 dark:border-zinc-800 hover:border-[#ff7900]/50'
                     }`}
                   >
-                    <div className="w-10 h-10 bg-[#ff7900] rounded-lg flex items-center justify-center text-white font-black text-xs">OM</div>
-                    <span className="font-bold text-sm text-slate-800 dark:text-zinc-200">Orange Money</span>
+                    <div className="w-8 h-8 bg-[#ff7900] rounded-lg flex items-center justify-center text-white font-black text-[10px]">OM</div>
+                    <span className="font-bold text-xs text-slate-800 dark:text-zinc-200">Orange</span>
                   </div>
 
                   {/* MTN Mobile Money */}
                   <div 
                     onClick={() => setPaymentMethod('MTN Mobile Money')}
-                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    className={`flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all ${
                       paymentMethod === 'MTN Mobile Money' ? 'border-[#ffcc00] bg-yellow-50/50 dark:bg-yellow-950/20' : 'border-slate-100 dark:border-zinc-800 hover:border-[#ffcc00]/50'
                     }`}
                   >
-                    <div className="w-10 h-10 bg-[#ffcc00] rounded-lg flex items-center justify-center text-slate-900 font-black text-xs">MTN</div>
-                    <span className="font-bold text-sm text-slate-800 dark:text-zinc-200">Mobile Money</span>
+                    <div className="w-8 h-8 bg-[#ffcc00] rounded-lg flex items-center justify-center text-slate-900 font-black text-[10px]">MTN</div>
+                    <span className="font-bold text-xs text-slate-800 dark:text-zinc-200">MTN</span>
+                  </div>
+
+                  {/* Carte Bancaire / Autres */}
+                  <div 
+                    onClick={() => setPaymentMethod('Carte Bancaire (Afrique)')}
+                    className={`flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                      paymentMethod === 'Carte Bancaire (Afrique)' ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/20' : 'border-slate-100 dark:border-zinc-800 hover:border-blue-500/50'
+                    }`}
+                  >
+                    <div className="w-8 h-8 bg-slate-800 dark:bg-slate-700 rounded-lg flex items-center justify-center text-white font-black text-[10px]"><CreditCard size={14}/></div>
+                    <span className="font-bold text-xs text-slate-800 dark:text-zinc-200">Carte</span>
                   </div>
                 </div>
 
                 <div className="space-y-2 mb-6">
-                  <label className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Numéro de téléphone payeur</label>
+                  <label className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+                    {paymentMethod === 'Carte Bancaire (Afrique)' ? 'Numéro de Carte / Téléphone' : 'Numéro de téléphone payeur'}
+                  </label>
                   <input 
                     type="tel" 
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="ex: 620000000"
+                    placeholder={paymentMethod === 'Carte Bancaire (Afrique)' ? "Numéro..." : "ex: 620000000"}
                     className="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-xl text-slate-800 dark:text-white font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
-                  <p className="text-[10px] text-slate-400 dark:text-zinc-500 mt-1">Un pop-up de validation s'affichera sur votre téléphone.</p>
+                  <p className="text-[10px] text-slate-400 dark:text-zinc-500 mt-1">
+                    {paymentMethod === 'Carte Bancaire (Afrique)' ? 'Paiement sécurisé par carte ou méthode alternative.' : 'Un pop-up de validation s\'affichera sur votre téléphone.'}
+                  </p>
                 </div>
 
                 <div className="bg-slate-50 dark:bg-zinc-950 rounded-xl p-4 border border-slate-100 dark:border-zinc-800 mb-6">
@@ -252,6 +287,10 @@ export default function SubscriptionModal({ isOpen, onClose, userId, userEmail, 
                   <div className="flex justify-between items-center pt-2 border-t border-slate-200 dark:border-zinc-800">
                     <span className="font-bold text-slate-800 dark:text-zinc-200">Total à payer</span>
                     <span className="text-xl font-black text-blue-600 dark:text-blue-400">{formatFCFA(getPrice(selectedPlan, billingCycle))}</span>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-zinc-800 flex items-center justify-between">
+                    <span className="text-xs text-slate-500 dark:text-zinc-400">Marchand Receveur :</span>
+                    <span className="text-xs font-bold text-slate-800 dark:text-zinc-300">624 02 77 87</span>
                   </div>
                 </div>
 

@@ -74,6 +74,14 @@ export default function DashboardPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isSubActive, setIsSubActive] = useState(true); // Default to true while loading
   const [subDaysLeft, setSubDaysLeft] = useState(0);
+  const [pendingPlan, setPendingPlan] = useState<'Pro' | 'Business' | null>(null);
+
+  useEffect(() => {
+    if (user && pendingPlan) {
+      setShowSubscriptionModal(true);
+    }
+  }, [user, pendingPlan]);
+
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -858,7 +866,10 @@ export default function DashboardPage() {
 
   if (user === null) {
     if (showLanding) {
-      return <LandingPage onStart={() => setShowLanding(false)} />;
+      return <LandingPage onStart={(plan) => {
+        if (plan) setPendingPlan(plan);
+        setShowLanding(false);
+      }} />;
     }
 
     return (
@@ -1564,9 +1575,13 @@ export default function DashboardPage() {
       {user && (
         <SubscriptionModal 
           isOpen={showSubscriptionModal} 
-          onClose={() => setShowSubscriptionModal(false)}
+          onClose={() => {
+            setShowSubscriptionModal(false);
+            setPendingPlan(null);
+          }}
           userId={user.id}
           userEmail={user.email}
+          initialPlan={pendingPlan || undefined}
           showToast={showToast}
           onSuccess={async () => {
              // Rafraichir l'abonnement

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export default function Pricing({ onStart }: { onStart: () => void }) {
+export default function Pricing({ onStart }: { onStart: (plan?: 'Pro' | 'Business') => void }) {
   return (
     <section id="tarifs" className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg fade-in-up delay-300">
       <div className="text-center mb-stack-lg">
@@ -38,9 +38,9 @@ export default function Pricing({ onStart }: { onStart: () => void }) {
               Support par email
             </li>
           </ul>
-          <a href="mailto:doredev2@gmail.com?subject=Demande d'abonnement IziFacture - Plan Gratuit" className="block w-full py-3 px-4 border border-primary text-primary font-label-md text-center rounded-lg hover:bg-primary/5 transition-colors">
+          <button onClick={() => onStart()} className="w-full py-3 px-4 border border-primary text-primary font-label-md text-center rounded-lg hover:bg-primary/5 transition-colors">
             Commencer
-          </a>
+          </button>
         </div>
 
         {/* Pro Plan */}
@@ -73,9 +73,9 @@ export default function Pricing({ onStart }: { onStart: () => void }) {
               Support prioritaire
             </li>
           </ul>
-          <a href="mailto:doredev2@gmail.com?subject=Demande d'abonnement IziFacture - Plan Pro" className="block w-full py-3 px-4 bg-primary text-on-primary font-label-md text-center rounded-lg hover:opacity-90 transition-opacity">
+          <button onClick={() => onStart('Pro')} className="w-full py-3 px-4 bg-primary text-on-primary font-label-md text-center rounded-lg hover:opacity-90 transition-opacity">
             Choisir Pro
-          </a>
+          </button>
         </div>
 
         {/* Business Plan */}
@@ -105,9 +105,9 @@ export default function Pricing({ onStart }: { onStart: () => void }) {
               API & Intégrations
             </li>
           </ul>
-          <a href="mailto:doredev2@gmail.com?subject=Demande d'abonnement IziFacture - Plan Business" className="block w-full py-3 px-4 border border-primary text-primary font-label-md text-center rounded-lg hover:bg-primary/5 transition-colors">
+          <button onClick={() => onStart('Business')} className="w-full py-3 px-4 border border-primary text-primary font-label-md text-center rounded-lg hover:bg-primary/5 transition-colors">
             Choisir Business
-          </a>
+          </button>
         </div>
       </div>
     </section>
