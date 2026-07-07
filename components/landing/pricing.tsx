@@ -38,9 +38,9 @@ export default function Pricing({ onStart }: { onStart: () => void }) {
               Support par email
             </li>
           </ul>
-          <button onClick={onStart} className="w-full py-3 px-4 border border-primary text-primary font-label-md text-center rounded-lg hover:bg-primary/5 transition-colors">
+          <a href="mailto:doredev2@gmail.com?subject=Demande d'abonnement IziFacture - Plan Gratuit" className="block w-full py-3 px-4 border border-primary text-primary font-label-md text-center rounded-lg hover:bg-primary/5 transition-colors">
             Commencer
-          </button>
+          </a>
         </div>
 
         {/* Pro Plan */}
@@ -73,9 +73,9 @@ export default function Pricing({ onStart }: { onStart: () => void }) {
               Support prioritaire
             </li>
           </ul>
-          <button onClick={onStart} className="w-full py-3 px-4 bg-primary text-on-primary font-label-md text-center rounded-lg hover:opacity-90 transition-opacity">
+          <a href="mailto:doredev2@gmail.com?subject=Demande d'abonnement IziFacture - Plan Pro" className="block w-full py-3 px-4 bg-primary text-on-primary font-label-md text-center rounded-lg hover:opacity-90 transition-opacity">
             Choisir Pro
-          </button>
+          </a>
         </div>
 
         {/* Business Plan */}
@@ -105,9 +105,9 @@ export default function Pricing({ onStart }: { onStart: () => void }) {
               API & Intégrations
             </li>
           </ul>
-          <button onClick={onStart} className="w-full py-3 px-4 border border-primary text-primary font-label-md text-center rounded-lg hover:bg-primary/5 transition-colors">
+          <a href="mailto:doredev2@gmail.com?subject=Demande d'abonnement IziFacture - Plan Business" className="block w-full py-3 px-4 border border-primary text-primary font-label-md text-center rounded-lg hover:bg-primary/5 transition-colors">
             Choisir Business
-          </button>
+          </a>
         </div>
       </div>
     </section>
