@@ -71,6 +71,27 @@ export interface Transaction {
   invoiceNumber?: string;
 }
 
+export interface Subscription {
+  id: string;
+  userId: string;
+  planName: 'Gratuit' | 'Pro' | 'Business';
+  status: 'active' | 'expired' | 'cancelled';
+  startDate: string;
+  endDate: string;
+  createdAt?: string;
+}
+
+export interface PaymentRecord {
+  id: string;
+  userId: string;
+  transactionId: string;
+  amount: number;
+  currency: string;
+  method: string;
+  status: 'pending' | 'completed' | 'failed';
+  createdAt?: string;
+}
+
 export interface Budget {
   id: string;
   category: string;

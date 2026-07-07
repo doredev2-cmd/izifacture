@@ -44,6 +44,10 @@ interface SidebarProps {
   onSelectInvoice?: (invoice: Invoice) => void;
   user: { name: string; email: string } | null;
   onLogout: () => void;
+  isSubActive?: boolean;
+  subscription?: any;
+  subDaysLeft?: number;
+  onOpenSubscription?: () => void;
 }
 
 export default function Sidebar({ 
@@ -63,7 +67,11 @@ export default function Sidebar({
   invoices,
   onSelectInvoice,
   user,
-  onLogout
+  onLogout,
+  isSubActive,
+  subscription,
+  subDaysLeft,
+  onOpenSubscription
 }: SidebarProps) {
   const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -504,6 +512,36 @@ export default function Sidebar({
               </button>
             );
           })}
+
+          {/* Subscription Widget */}
+          {user && role !== 'admin' && (
+            <div className="mx-3 mt-6 mb-2 p-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-zinc-900 dark:to-zinc-800 rounded-xl border border-slate-200/60 dark:border-zinc-700/60 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-2 opacity-10">
+                <ShieldAlert size={40} />
+              </div>
+              <div className="relative z-10">
+                <h4 className="text-[11px] font-bold text-slate-800 dark:text-zinc-200 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${isSubActive ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+                  Abonnement {subscription?.planName || 'Gratuit'}
+                </h4>
+                {isSubActive ? (
+                  <p className="text-xs text-slate-500 dark:text-zinc-400 mb-3 font-medium">
+                    {subDaysLeft} jours restants
+                  </p>
+                ) : (
+                  <p className="text-xs text-rose-500 font-bold mb-3">
+                    Expiré ou limité
+                  </p>
+                )}
+                <button
+                  onClick={onOpenSubscription}
+                  className="w-full py-1.5 bg-white dark:bg-zinc-950 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-lg border border-slate-200 dark:border-zinc-800 hover:border-blue-300 dark:hover:border-blue-900 transition-colors shadow-sm"
+                >
+                  {isSubActive ? 'Gérer mon plan' : 'S\'abonner'}
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="pt-6 px-3 mb-2 text-[10px] font-bold text-slate-400 dark:text-zinc-550 uppercase tracking-wider">
             Support & Réglages

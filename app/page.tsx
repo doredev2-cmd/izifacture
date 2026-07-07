@@ -19,18 +19,21 @@ import SettingsPage from '../components/settings-page';
 import HelpPage from '../components/help-page';
 import AdminDashboard from '../components/admin-dashboard';
 import LandingPage from '../components/landing-page';
+import SubscriptionModal from '../components/subscription-modal';
 
 import { 
   Company, 
   Client, 
   Invoice, 
   Transaction,
+  Subscription,
   mockCompanies, 
   mockInvoices, 
   mockClients, 
   mockTransactions,
   formatFCFA 
 } from '../lib/data';
+import { isSubscriptionActive, getUserSubscription, getDaysRemaining } from '../lib/subscription';
 import { supabase } from '../lib/supabase';
 import { Calendar, Bell, Users, TrendingUp, Info, CheckCircle, AlertTriangle, X, Eye, EyeOff, Download } from 'lucide-react';
 
@@ -65,6 +68,12 @@ export default function DashboardPage() {
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Subscription state
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [isSubActive, setIsSubActive] = useState(true); // Default to true while loading
+  const [subDaysLeft, setSubDaysLeft] = useState(0);
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -447,6 +456,19 @@ export default function DashboardPage() {
         if (invoicesData) setInvoices(invoicesData);
         if (transactionsData) setTransactions(transactionsData);
         
+        // Fetch subscription
+        if (user) {
+          const sub = await getUserSubscription(user.id);
+          setSubscription(sub);
+          const active = await isSubscriptionActive(user.id);
+          setIsSubActive(active);
+          if (sub && active) {
+            setSubDaysLeft(getDaysRemaining(sub.endDate));
+          } else {
+            setSubDaysLeft(0);
+          }
+        }
+        
       } catch (error) {
         console.error("Error fetching data from Supabase:", error);
       } finally {
@@ -558,6 +580,13 @@ export default function DashboardPage() {
 
   // Handlers for Invoice management
   const handleSaveInvoice = async (savedInv: Invoice) => {
+    // Vérification de l'abonnement
+    if (!isSubActive && invoices.length >= 3) {
+      showToast("Votre abonnement a expiré ou la limite de factures gratuites est atteinte. Veuillez souscrire à un plan.", "error");
+      setShowSubscriptionModal(true);
+      return false;
+    }
+
     const exists = invoices.some(inv => inv.id === savedInv.id);
     const oldInv = invoices.find(inv => inv.id === savedInv.id);
     try {
@@ -741,6 +770,12 @@ export default function DashboardPage() {
 
   // Handlers for Client management
   const handleAddClient = async (newCli: Client) => {
+    if (!isSubActive && clients.length >= 5) {
+      showToast("Votre abonnement a expiré ou la limite de clients gratuits est atteinte. Veuillez souscrire à un plan.", "error");
+      setShowSubscriptionModal(true);
+      return;
+    }
+    
     try {
       const clientWithUser = { ...newCli, userId: user?.id };
       const { data: dbCli, error } = await supabase.from('clients').insert([clientWithUser]).select().single();
@@ -1076,6 +1111,10 @@ export default function DashboardPage() {
         }}
         user={user}
         onLogout={handleLogout}
+        isSubActive={isSubActive}
+        subscription={subscription}
+        subDaysLeft={subDaysLeft}
+        onOpenSubscription={() => setShowSubscriptionModal(true)}
       />
 
       {/* Main Content Area */}
@@ -1521,6 +1560,25 @@ export default function DashboardPage() {
           </>
         )}
       </main>
+      {/* Subscription Modal */}
+      {user && (
+        <SubscriptionModal 
+          isOpen={showSubscriptionModal} 
+          onClose={() => setShowSubscriptionModal(false)}
+          userId={user.id}
+          userEmail={user.email}
+          showToast={showToast}
+          onSuccess={async () => {
+             // Rafraichir l'abonnement
+             const sub = await getUserSubscription(user.id);
+             setSubscription(sub);
+             setIsSubActive(true);
+             if (sub) {
+                setSubDaysLeft(getDaysRemaining(sub.endDate));
+             }
+          }}
+        />
+      )}
     </div>
   );
 }

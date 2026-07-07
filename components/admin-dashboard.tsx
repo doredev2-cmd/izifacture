@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Users, Lock, Unlock, KeyRound, ShieldAlert, CheckCircle, Search, RefreshCw, Trash2, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { Users, Lock, Unlock, KeyRound, ShieldAlert, CheckCircle, Search, RefreshCw, Trash2, ArrowUpCircle, ArrowDownCircle, CreditCard, Activity, DollarSign } from 'lucide-react';
 import { listAllUsers, toggleBlockUser, changeUserPassword, deleteUser, promoteToAdmin } from '../app/actions/admin';
 
 interface AdminUser {
@@ -18,6 +18,7 @@ export default function AdminDashboard({ showToast }: { showToast: (msg: string,
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<'users' | 'subscriptions'>('users');
   
   // Password change state
   const [selectedUserForPassword, setSelectedUserForPassword] = useState<AdminUser | null>(null);
@@ -135,7 +136,32 @@ export default function AdminDashboard({ showToast }: { showToast: (msg: string,
         </button>
       </div>
 
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200/60 dark:border-zinc-800/60 shadow-soft overflow-hidden">
+      {/* Admin Tabs */}
+      <div className="flex gap-4 border-b border-slate-200 dark:border-zinc-800">
+        <button
+          onClick={() => setActiveTab('users')}
+          className={`pb-3 text-sm font-bold transition-colors border-b-2 ${
+            activeTab === 'users' 
+            ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400' 
+            : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-white'
+          }`}
+        >
+          <div className="flex items-center gap-2"><Users size={16} /> Utilisateurs</div>
+        </button>
+        <button
+          onClick={() => setActiveTab('subscriptions')}
+          className={`pb-3 text-sm font-bold transition-colors border-b-2 ${
+            activeTab === 'subscriptions' 
+            ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400' 
+            : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-white'
+          }`}
+        >
+          <div className="flex items-center gap-2"><CreditCard size={16} /> Abonnements</div>
+        </button>
+      </div>
+
+      {activeTab === 'users' && (
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200/60 dark:border-zinc-800/60 shadow-soft overflow-hidden">
         <div className="p-4 border-b border-slate-200/60 dark:border-zinc-800/60 flex items-center justify-between bg-slate-50/50 dark:bg-zinc-900/50">
           <div className="relative w-full max-w-sm">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -244,6 +270,74 @@ export default function AdminDashboard({ showToast }: { showToast: (msg: string,
           </table>
         </div>
       </div>
+      )}
+
+      {activeTab === 'subscriptions' && (
+        <div className="space-y-6">
+          {/* Mock KPIs for subscriptions */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800/60 p-5 rounded-2xl shadow-soft">
+              <div className="flex justify-between items-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 flex items-center justify-center">
+                  <DollarSign size={20} />
+                </div>
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-1">2 400 000 GNF</h3>
+              <p className="text-xs font-medium text-slate-500 dark:text-zinc-400">Revenus ce mois</p>
+            </div>
+            
+            <div className="bg-white dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800/60 p-5 rounded-2xl shadow-soft">
+              <div className="flex justify-between items-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 flex items-center justify-center">
+                  <Activity size={20} />
+                </div>
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-1">14</h3>
+              <p className="text-xs font-medium text-slate-500 dark:text-zinc-400">Abonnements actifs</p>
+            </div>
+
+            <div className="bg-white dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800/60 p-5 rounded-2xl shadow-soft">
+              <div className="flex justify-between items-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 flex items-center justify-center">
+                  <ShieldAlert size={20} />
+                </div>
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-1">3</h3>
+              <p className="text-xs font-medium text-slate-500 dark:text-zinc-400">Abonnements expirés</p>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200/60 dark:border-zinc-800/60 shadow-soft overflow-hidden">
+             <div className="p-4 border-b border-slate-200/60 dark:border-zinc-800/60 bg-slate-50/50 dark:bg-zinc-900/50">
+               <h3 className="font-bold text-slate-800 dark:text-zinc-200 text-sm">Derniers paiements (Simulation)</h3>
+             </div>
+             <table className="w-full text-left text-sm whitespace-nowrap">
+                <thead className="bg-slate-50 dark:bg-zinc-950/50 text-slate-500 dark:text-zinc-400 font-bold text-[11px] uppercase tracking-wider">
+                  <tr>
+                    <th className="p-4">Transaction ID</th>
+                    <th className="p-4">Plan</th>
+                    <th className="p-4">Montant</th>
+                    <th className="p-4">Statut</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/50 text-slate-700 dark:text-zinc-300">
+                  <tr className="hover:bg-slate-50/50 dark:hover:bg-zinc-800/20">
+                    <td className="p-4 font-mono text-xs">TX_OM_12345</td>
+                    <td className="p-4 font-bold">Pro</td>
+                    <td className="p-4 text-emerald-600 font-bold">90 000 GNF</td>
+                    <td className="p-4"><span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-950/45">Payé</span></td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50 dark:hover:bg-zinc-800/20">
+                    <td className="p-4 font-mono text-xs">TX_MTN_67890</td>
+                    <td className="p-4 font-bold">Business</td>
+                    <td className="p-4 text-emerald-600 font-bold">300 000 GNF</td>
+                    <td className="p-4"><span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-950/45">Payé</span></td>
+                  </tr>
+                </tbody>
+             </table>
+          </div>
+        </div>
+      )}
 
       {/* Modal Changement Mot de Passe */}
       {selectedUserForPassword && (
